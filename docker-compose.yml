@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  cotonou-auth:
+    image: cotonou-auth
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: runtime-auth
+  
+  cotonou-notif:
+    image: cotonou-notif
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: runtime-notif
+
+  cotonou-matchmaking-service:
+    image: cotonou-matchmaking-service
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: runtime-mms

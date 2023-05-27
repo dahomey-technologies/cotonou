@@ -1,0 +1,9 @@
+[workspace]
+
+members = [
+    "cotonou-auth",
+    "cotonou-common",
+    "cotonou-notif",
+    "cotonou-matchmaking-job",
+    "cotonou-matchmaking-service",
+]

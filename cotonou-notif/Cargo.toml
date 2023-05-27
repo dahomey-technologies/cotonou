@@ -1,0 +1,11 @@
+[package]
+name = "cotonou-notif"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common_macros = "0"
+tokio = { version = "1.26", features = ["rt-multi-thread"] }
+hyper = { version = "0.14" }
+axum = { version = "0.6" }
+cotonou-common = { path = "../cotonou-common", features = ["authentication", "notifications"] }

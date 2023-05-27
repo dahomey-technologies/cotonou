@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  cotonou-auth:
+    ports:
+      - 8080:8080
+    depends_on:
+      - redis
+      - mongo
+  
+  cotonou-notif:
+    ports:
+      - 8081:8080
+    depends_on:
+      - redis
+
+  cotonou-matchmaking-service:
+    ports:
+      - 8082:8080
+    depends_on:
+      - redis
+      - mongo
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
