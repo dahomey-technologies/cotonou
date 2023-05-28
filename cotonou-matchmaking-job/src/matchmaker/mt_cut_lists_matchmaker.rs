@@ -34,19 +34,14 @@ impl MultiThreadedCutListsMatchmaker {
         game_mode_config: GameModeConfig,
         match_functions: Box<dyn MatchFunctions>,
     ) -> Self {
-        let mut m = Self {
+        Self {
             _region_system_name: region_system_name.to_owned(),
             game_mode_config,
             match_functions,
             jobs: Vec::new(),
             msg_senders: Vec::new(),
             msg_receivers: Vec::new(),
-        };
-
-        m.new_job();
-        m.new_job();
-
-        m
+        }
     }
 
     fn new_job(&mut self) {
