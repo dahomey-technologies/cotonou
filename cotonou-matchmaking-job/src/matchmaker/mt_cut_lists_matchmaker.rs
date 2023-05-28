@@ -14,8 +14,6 @@ use cotonou_common::{
     models::{GameModeConfig, ProfileId},
 };
 
-const MMR_RANGE: u32 = 100;
-
 /// Based Multi-Threaded CutLists algorithm described here:
 /// "Scalable services for massively multiplayer online games" by Maxime Véron p.42
 /// https://theses.hal.science/tel-01230852
@@ -23,6 +21,7 @@ pub struct MultiThreadedCutListsMatchmaker {
     _region_system_name: String,
     game_mode_config: GameModeConfig,
     match_functions: Box<dyn MatchFunctions>,
+    mmr_range: u32,
     jobs: Vec<JoinHandle<()>>,
     msg_senders: Vec<mpsc::Sender<MessageToJob>>,
     msg_receivers: Vec<mpsc::Receiver<MessageFromJob>>,
@@ -33,11 +32,13 @@ impl MultiThreadedCutListsMatchmaker {
         region_system_name: &str,
         game_mode_config: GameModeConfig,
         match_functions: Box<dyn MatchFunctions>,
+        mmr_range: u32,
     ) -> Self {
         Self {
             _region_system_name: region_system_name.to_owned(),
             game_mode_config,
             match_functions,
+            mmr_range,
             jobs: Vec::new(),
             msg_senders: Vec::new(),
             msg_receivers: Vec::new(),
@@ -82,7 +83,7 @@ impl Drop for MultiThreadedCutListsMatchmaker {
 
 impl Matchmaker for MultiThreadedCutListsMatchmaker {
     fn insert_ticket(&mut self, ticket: &MatchmakingTicket) {
-        let mmr_index = (get_average_mmr(&ticket.players) / MMR_RANGE) as usize;
+        let mmr_index = (get_average_mmr(&ticket.players) / self.mmr_range) as usize;
         if mmr_index >= self.jobs.len() {
             let num_elements_to_add = mmr_index - self.jobs.len() + 1;
             for _ in 0..num_elements_to_add {
@@ -98,7 +99,7 @@ impl Matchmaker for MultiThreadedCutListsMatchmaker {
     }
 
     fn remove_ticket(&mut self, ticket: &MatchmakingTicket) {
-        let mmr_index = (get_average_mmr(&ticket.players) / MMR_RANGE) as usize;
+        let mmr_index = (get_average_mmr(&ticket.players) / self.mmr_range) as usize;
         if let Some(sender) = self.msg_senders.get(mmr_index) {
             if let Err(e) = sender.send(MessageToJob::RemoveTicket {
                 owner_profile_id: ticket.owner_profile_id,
@@ -111,7 +112,7 @@ impl Matchmaker for MultiThreadedCutListsMatchmaker {
     }
 
     fn insert_session(&mut self, session: &MatchmakingSession) {
-        let mmr_index = (get_average_mmr(&session.players) / MMR_RANGE) as usize;
+        let mmr_index = (get_average_mmr(&session.players) / self.mmr_range) as usize;
         if let Some(sender) = self.msg_senders.get(mmr_index) {
             if let Err(e) = sender.send(MessageToJob::InsertSession {
                 session_id: session.session_id,
@@ -125,7 +126,7 @@ impl Matchmaker for MultiThreadedCutListsMatchmaker {
     }
 
     fn remove_session(&mut self, session: &MatchmakingSession) {
-        let mmr_index = (get_average_mmr(&session.players) / MMR_RANGE) as usize;
+        let mmr_index = (get_average_mmr(&session.players) / self.mmr_range) as usize;
         if let Some(sender) = self.msg_senders.get(mmr_index) {
             if let Err(e) = sender.send(MessageToJob::RemoveSession {
                 session_id: session.session_id,

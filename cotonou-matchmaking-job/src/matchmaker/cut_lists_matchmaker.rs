@@ -14,7 +14,6 @@ use cotonou_common::{
 use std::iter::repeat;
 
 const TICKET_INITIAL_CAPACITY: usize = 10;
-const MMR_RANGE: u32 = 100;
 
 /// Based CutLists algorithm described here:
 /// "Scalable services for massively multiplayer online games" by Maxime Véron p.41
@@ -23,6 +22,7 @@ pub struct CutListsMatchmaker {
     _region_system_name: String,
     game_mode_config: GameModeConfig,
     match_functions: Box<dyn MatchFunctions>,
+    mmr_range: u32,
     open_sessions: QueueMap<SessionId>,
     open_tickets: Vec<QueueMap<ProfileId>>,
 }
@@ -32,11 +32,13 @@ impl CutListsMatchmaker {
         region_system_name: &str,
         game_mode_config: GameModeConfig,
         match_functions: Box<dyn MatchFunctions>,
+        mmr_range: u32,
     ) -> Self {
         Self {
             _region_system_name: region_system_name.to_owned(),
             game_mode_config,
             match_functions,
+            mmr_range,
             open_sessions: QueueMap::new(),
             open_tickets: Vec::with_capacity(TICKET_INITIAL_CAPACITY),
         }
@@ -135,7 +137,7 @@ impl CutListsMatchmaker {
 
 impl Matchmaker for CutListsMatchmaker {
     fn insert_ticket(&mut self, ticket: &MatchmakingTicket) {
-        let mmr_index = (get_average_mmr(&ticket.players) / MMR_RANGE) as usize;
+        let mmr_index = (get_average_mmr(&ticket.players) / self.mmr_range) as usize;
         if mmr_index >= self.open_tickets.len() {
             let num_elements_to_add = mmr_index - self.open_tickets.len() + 1;
             self.open_tickets
@@ -145,7 +147,7 @@ impl Matchmaker for CutListsMatchmaker {
     }
 
     fn remove_ticket(&mut self, ticket: &MatchmakingTicket) {
-        let mmr_index = (get_average_mmr(&ticket.players) / MMR_RANGE) as usize;
+        let mmr_index = (get_average_mmr(&ticket.players) / self.mmr_range) as usize;
         if let Some(open_tickets) = self.open_tickets.get_mut(mmr_index) {
             open_tickets.remove(&ticket.owner_profile_id);
         } else {

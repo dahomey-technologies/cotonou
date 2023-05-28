@@ -25,7 +25,7 @@ impl MatchmakingSettingsDAL {
                     GameModeConfig {
                         name: "Ranked".to_owned(),
                         short_name: "r".to_owned(),
-                        matchmaker_type: MatchmakerConfig::CutLists,
+                        matchmaker_type: MatchmakerConfig::CutLists { mmr_range: 100 },
                         match_functions_type: MatchFunctionsConfig::Mmr {
                             max_mmr_distance: 300,
                             waiting_time_weight: 10,
@@ -37,7 +37,7 @@ impl MatchmakingSettingsDAL {
                     GameModeConfig {
                         name: "MTRanked".to_owned(),
                         short_name: "mtr".to_owned(),
-                        matchmaker_type: MatchmakerConfig::MultiThreadedCutLists,
+                        matchmaker_type: MatchmakerConfig::MultiThreadedCutLists { mmr_range: 100 },
                         match_functions_type: MatchFunctionsConfig::Mmr {
                             max_mmr_distance: 300,
                             waiting_time_weight: 10,

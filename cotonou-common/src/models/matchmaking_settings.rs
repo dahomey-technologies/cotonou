@@ -17,8 +17,8 @@ pub struct GameModeConfig {
 #[derive(Debug, Clone)]
 pub enum MatchmakerConfig {
     SimpleList,
-    CutLists,
-    MultiThreadedCutLists,
+    CutLists { mmr_range: u32 },
+    MultiThreadedCutLists { mmr_range: u32 },
 }
 
 #[cfg(feature = "matchmaking")]

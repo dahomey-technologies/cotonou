@@ -25,15 +25,17 @@ pub fn new_matchmaker(
             game_mode_config,
             match_functions,
         )),
-        MatchmakerConfig::CutLists => Box::new(CutListsMatchmaker::new(
+        MatchmakerConfig::CutLists { mmr_range } => Box::new(CutListsMatchmaker::new(
             region_system_name,
             game_mode_config,
             match_functions,
+            mmr_range
         )),
-        MatchmakerConfig::MultiThreadedCutLists => Box::new(MultiThreadedCutListsMatchmaker::new(
+        MatchmakerConfig::MultiThreadedCutLists { mmr_range } => Box::new(MultiThreadedCutListsMatchmaker::new(
             region_system_name,
             game_mode_config,
             match_functions,
+            mmr_range
         )),
     }
 }
