@@ -3,9 +3,9 @@ use error::Error;
 use tokio::sync::watch;
 
 mod error;
-mod first_come_first_served;
 mod game_server_manager;
 mod item_cache;
+mod match_functions;
 mod matchmaker;
 mod matchmaking_assembler;
 mod matchmaking_dal;
@@ -14,7 +14,6 @@ mod matchmaking_master_job;
 mod matchmaking_waiting_time_cache;
 mod notification_cache;
 mod queue_map;
-mod ranked_matchmaker;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {

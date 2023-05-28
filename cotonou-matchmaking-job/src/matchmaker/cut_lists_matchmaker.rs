@@ -1,6 +1,7 @@
 use std::iter::repeat;
 
 use crate::{
+    match_functions::MatchFunctions,
     matchmaker::{Matchmaker, MatchmakerContext},
     queue_map::QueueMap,
 };
@@ -10,29 +11,32 @@ use cotonou_common::{
         matchmaking_ticket::{MatchmakingPlayer, MatchmakingTicket},
     },
     models::{GameModeConfig, ProfileId},
-    unix_now,
 };
 
 const TICKET_INITIAL_CAPACITY: usize = 10;
 const MMR_RANGE: u32 = 100;
-const MAX_MMR_DISTANCE: u32 = 300;
-const WAITING_TIME_WEIGHT: u32 = 10;
 
 /// Based cutlist algorithm described here:
 /// "Scalable services for massively multiplayer online games" by Maxime Véron p.41
 /// https://theses.hal.science/tel-01230852
-pub struct RankedMatchmaker {
+pub struct CutListsMatchmaker {
     _region_system_name: String,
     game_mode_config: GameModeConfig,
+    match_functions: Box<dyn MatchFunctions>,
     open_sessions: QueueMap<SessionId>,
     open_tickets: Vec<QueueMap<ProfileId>>,
 }
 
-impl RankedMatchmaker {
-    pub fn new(region_system_name: &str, game_mode_config: GameModeConfig) -> Self {
+impl CutListsMatchmaker {
+    pub fn new(
+        region_system_name: &str,
+        game_mode_config: GameModeConfig,
+        match_functions: Box<dyn MatchFunctions>,
+    ) -> Self {
         Self {
             _region_system_name: region_system_name.to_owned(),
             game_mode_config,
+            match_functions,
             open_sessions: QueueMap::new(),
             open_tickets: Vec::with_capacity(TICKET_INITIAL_CAPACITY),
         }
@@ -41,61 +45,6 @@ impl RankedMatchmaker {
     fn get_average_mmr(&self, players: &[MatchmakingPlayer]) -> u32 {
         let sum = players.iter().fold(0, |acc, p| acc + p.mmr);
         sum / players.len() as u32
-    }
-
-    fn get_average_waiting_time(&self, players: &[MatchmakingPlayer]) -> u32 {
-        let now = unix_now();
-        let sum = players.iter().fold(0, |acc, p| acc + now - p.creation_time);
-        sum as u32 / players.len() as u32
-    }
-
-    fn is_ticket_with_session_match(
-        &self,
-        ticket: &MatchmakingTicket,
-        session: &MatchmakingSession,
-    ) -> bool {
-        if !self.is_size_player_match(ticket.players.iter().chain(session.players.iter())) {
-            return false;
-        }
-
-        self.is_mmr_player_match(&ticket.players, &session.players)
-    }
-
-    fn is_ticket_with_ticket_match(
-        &self,
-        ticket1: &MatchmakingTicket,
-        ticket2: &MatchmakingTicket,
-    ) -> bool {
-        if !self.is_size_player_match(ticket1.players.iter().chain(ticket2.players.iter())) {
-            return false;
-        }
-
-        self.is_mmr_player_match(&ticket1.players, &ticket2.players)
-    }
-
-    fn is_ticket_match(&self, ticket: &MatchmakingTicket) -> bool {
-        self.is_size_player_match(ticket.players.iter())
-    }
-
-    fn is_size_player_match<'b, I: Iterator<Item = &'b MatchmakingPlayer>>(
-        &self,
-        players: I,
-    ) -> bool {
-        let num_players = players.count();
-        num_players >= self.game_mode_config.min_players
-            && num_players <= self.game_mode_config.max_players
-    }
-
-    fn is_mmr_player_match(
-        &self,
-        group1: &[MatchmakingPlayer],
-        group2: &[MatchmakingPlayer],
-    ) -> bool {
-        let distance = (self.get_average_mmr(group1) as i64 - self.get_average_mmr(group2) as i64)
-            .unsigned_abs() as u32;
-        let waiting_time = self.get_average_waiting_time(group1);
-
-        u32::min(waiting_time * WAITING_TIME_WEIGHT, MAX_MMR_DISTANCE) > distance
     }
 
     fn process_until_session_creation(&mut self, context: &mut MatchmakerContext) -> bool {
@@ -117,7 +66,11 @@ impl RankedMatchmaker {
                         continue;
                     };
 
-                    if self.is_ticket_with_session_match(ticket, session) {
+                    if self.match_functions.is_ticket_with_session_match(
+                        &self.game_mode_config,
+                        ticket,
+                        session,
+                    ) {
                         context.match_ticket_to_existing_session(*ticket_id, *session_id);
                         break;
                     }
@@ -150,7 +103,11 @@ impl RankedMatchmaker {
                     };
 
                     if ticket1.owner_profile_id != ticket2.owner_profile_id
-                        && self.is_ticket_with_ticket_match(ticket1, ticket2)
+                        && self.match_functions.is_ticket_with_ticket_match(
+                            &self.game_mode_config,
+                            ticket1,
+                            ticket2,
+                        )
                     {
                         let session_id =
                             context.match_tickets_to_new_session(&[*ticket1_id, *ticket2_id]);
@@ -166,11 +123,14 @@ impl RankedMatchmaker {
                     continue;
                 };
 
-                if self.is_ticket_match(ticket1) {
+                if self
+                    .match_functions
+                    .is_ticket_match(&self.game_mode_config, ticket1)
+                {
                     let session_id = context.match_tickets_to_new_session(&[*ticket1_id]);
 
                     self.open_sessions.insert(session_id);
-    
+
                     // a new session has been created, restart processing tickets with existing sessions
                     return true;
                 }
@@ -181,7 +141,7 @@ impl RankedMatchmaker {
     }
 }
 
-impl Matchmaker for RankedMatchmaker {
+impl Matchmaker for CutListsMatchmaker {
     fn insert_ticket(&mut self, ticket: &MatchmakingTicket) {
         let mmr_index = (self.get_average_mmr(&ticket.players) / MMR_RANGE) as usize;
         if mmr_index >= self.open_tickets.len() {

@@ -6,7 +6,8 @@ use crate::models::GameRegion;
 pub struct GameModeConfig {
     pub name: String,
     pub short_name: String,
-    pub matchmaker_type: MatchmakerType,
+    pub matchmaker_type: MatchmakerConfig,
+    pub match_functions_type: MatchFunctionsConfig,
     pub min_players: usize,
     pub max_players: usize,
     pub team_player_count: usize,
@@ -14,9 +15,19 @@ pub struct GameModeConfig {
 
 #[cfg(feature = "matchmaking")]
 #[derive(Debug, Clone)]
-pub enum MatchmakerType {
+pub enum MatchmakerConfig {
+    SimpleList,
+    CutLists,
+}
+
+#[cfg(feature = "matchmaking")]
+#[derive(Debug, Clone)]
+pub enum MatchFunctionsConfig {
     FirstComeFirstServed,
-    Ranked
+    Mmr {
+        max_mmr_distance: u32,
+        waiting_time_weight: u32
+    },
 }
 
 #[cfg(feature = "matchmaking")]

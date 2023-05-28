@@ -1,46 +1,17 @@
 use crate::{
-    first_come_first_served::FirstComeFirstServed,
     matchmaking_assembler::MatchmakingAssembler,
     matchmaking_job::{SessionCache, TicketCache},
     queue_map::QueueMap,
-    ranked_matchmaker::RankedMatchmaker,
 };
 use cotonou_common::{
     matchmaking::{
         matchmaking_session::{MatchmakingSession, MatchmakingSessionStatus, SessionId},
         matchmaking_ticket::MatchmakingTicket,
     },
-    models::{GameModeConfig, MatchmakerType, ProfileId},
+    models::ProfileId,
     unix_now,
 };
 use std::collections::HashMap;
-
-pub fn new_matchmaker(
-    region_system_name: &str,
-    game_mode_config: GameModeConfig,
-) -> Box<dyn Matchmaker> {
-    match game_mode_config.matchmaker_type {
-        MatchmakerType::FirstComeFirstServed => Box::new(FirstComeFirstServed::new(
-            region_system_name,
-            game_mode_config,
-        )),
-        MatchmakerType::Ranked => Box::new(RankedMatchmaker::new(
-            region_system_name, 
-            game_mode_config
-        ))
-    }
-}
-
-pub trait Matchmaker: Send {
-    fn insert_ticket(&mut self, ticket: &MatchmakingTicket);
-    fn remove_ticket(&mut self, ticket: &MatchmakingTicket);
-    fn insert_session(&mut self, session: &MatchmakingSession);
-    fn remove_session(&mut self, session: &MatchmakingSession);
-    /// From open tickets, add players to existing sessions or create new sessions
-    /// # Return
-    /// new sessions
-    fn process(&mut self, context: &mut MatchmakerContext);
-}
 
 pub struct MatchmakerContext<'a> {
     region_system_name: &'a str,

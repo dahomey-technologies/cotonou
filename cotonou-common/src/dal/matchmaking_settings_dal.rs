@@ -1,4 +1,6 @@
-use crate::models::{GameModeConfig, GameRegion, MatchmakerType, MatchmakingSettings};
+use crate::models::{
+    GameModeConfig, GameRegion, MatchFunctionsConfig, MatchmakerConfig, MatchmakingSettings,
+};
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -10,14 +12,29 @@ impl MatchmakingSettingsDAL {
     pub fn new() -> Self {
         Self {
             matchmaking_settings: Arc::new(MatchmakingSettings {
-                game_mode_configs: vec![GameModeConfig {
-                    name: "QuickMatch".to_owned(),
-                    short_name: "qm".to_owned(),
-                    matchmaker_type: MatchmakerType::FirstComeFirstServed,
-                    min_players: 2,
-                    max_players: 8,
-                    team_player_count: 4,
-                }],
+                game_mode_configs: vec![
+                    GameModeConfig {
+                        name: "QuickMatch".to_owned(),
+                        short_name: "qm".to_owned(),
+                        matchmaker_type: MatchmakerConfig::SimpleList,
+                        match_functions_type: MatchFunctionsConfig::FirstComeFirstServed,
+                        min_players: 2,
+                        max_players: 8,
+                        team_player_count: 4,
+                    },
+                    GameModeConfig {
+                        name: "Ranked".to_owned(),
+                        short_name: "r".to_owned(),
+                        matchmaker_type: MatchmakerConfig::CutLists,
+                        match_functions_type: MatchFunctionsConfig::Mmr {
+                            max_mmr_distance: 300,
+                            waiting_time_weight: 10,
+                        },
+                        min_players: 2,
+                        max_players: 8,
+                        team_player_count: 4,
+                    },
+                ],
                 supported_regions: vec![GameRegion {
                     region_system_name: "eu-central-1".to_owned(),
                     region_prefix: "eu".to_owned(),
