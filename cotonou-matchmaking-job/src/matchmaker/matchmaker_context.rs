@@ -74,13 +74,13 @@ impl<'a> MatchmakerContext<'a> {
         self.sessions.update(session_id);
     }
 
-    pub fn match_tickets_to_new_session(&mut self, tickets_to_match: &[ProfileId]) -> SessionId {
+    pub fn match_tickets_to_new_session(&mut self, session_id: SessionId, tickets_to_match: &[ProfileId]) {
         let Some(ticket) = self.tickets.get(&tickets_to_match[0]) else {
             unreachable!()
         };
 
         let mut session = MatchmakingSession {
-            session_id: SessionId::new(),
+            session_id,
             game_mode: ticket.game_mode.clone(),
             players: Vec::new(),
             creation_time: unix_now(),
@@ -116,7 +116,6 @@ impl<'a> MatchmakerContext<'a> {
 
         self.sessions.create(session);
         self.created_sessions.insert(session_id);
-        session_id
     }
 
     fn match_ticket_to_session(

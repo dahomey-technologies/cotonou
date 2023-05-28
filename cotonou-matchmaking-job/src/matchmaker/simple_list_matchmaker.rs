@@ -1,5 +1,5 @@
 use crate::{
-    match_functions::MatchFunctions,
+    match_functions::{is_in_bounds, MatchFunctions},
     matchmaker::{Matchmaker, MatchmakerContext},
     queue_map::QueueMap,
 };
@@ -51,10 +51,10 @@ impl SimpleListMatchmaker {
                     continue;
                 };
 
-                if self.match_functions.is_ticket_with_session_match(
+                if self.match_functions.is_match(
                     &self.game_mode_config,
-                    ticket,
-                    session,
+                    &ticket.players,
+                    &session.players,
                 ) {
                     context.match_ticket_to_existing_session(*ticket_id, *session_id);
                     matched_tickets.push(*ticket_id);
@@ -69,7 +69,7 @@ impl SimpleListMatchmaker {
 
         // create new sessions
         for ticket1_id in self.open_tickets.iter() {
-            for ticket2_id in self.open_tickets.iter() {
+            for ticket2_id in self.open_tickets.iter().filter(|id| **id != *ticket1_id) {
                 let Some(ticket1) = context.get_ticket(ticket1_id) else {
                     continue;
                 };
@@ -78,15 +78,14 @@ impl SimpleListMatchmaker {
                     continue;
                 };
 
-                if ticket1.owner_profile_id != ticket2.owner_profile_id
-                    && self.match_functions.is_ticket_with_ticket_match(
+                if self.match_functions.is_match(
                         &self.game_mode_config,
-                        ticket1,
-                        ticket2,
+                        &ticket1.players,
+                        &ticket2.players,
                     )
                 {
-                    let session_id =
-                        context.match_tickets_to_new_session(&[*ticket1_id, *ticket2_id]);
+                    let session_id = SessionId::new();
+                    context.match_tickets_to_new_session(session_id, &[*ticket1_id, *ticket2_id]);
 
                     self.open_sessions.insert(session_id);
 
@@ -99,11 +98,9 @@ impl SimpleListMatchmaker {
                 continue;
             };
 
-            if self
-                .match_functions
-                .is_ticket_match(&self.game_mode_config, ticket1)
-            {
-                let session_id = context.match_tickets_to_new_session(&[*ticket1_id]);
+            if is_in_bounds(&self.game_mode_config, ticket1.players.iter()) {
+                let session_id = SessionId::new();
+                context.match_tickets_to_new_session(session_id, &[*ticket1_id]);
 
                 self.open_sessions.insert(session_id);
 

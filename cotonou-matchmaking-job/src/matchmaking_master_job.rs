@@ -24,11 +24,11 @@ pub struct MatchmakingMasterJob {
     matchmaking_waiting_time_dal: MatchmakingWaitingTimeDAL,
     matchmaking_assembler: MatchmakingAssembler,
     notification_manager: NotificationManager,
-    shutown_receiver: tokio::sync::watch::Receiver<()>,
+    shutdown_receiver: tokio::sync::watch::Receiver<()>,
 }
 
 impl MatchmakingMasterJob {
-    pub async fn new(shutown_receiver: tokio::sync::watch::Receiver<()>) -> Result<Self, Error> {
+    pub async fn new(shutdown_receiver: tokio::sync::watch::Receiver<()>) -> Result<Self, Error> {
         let redis_host = "127.0.0.1";
         let redis_connection_manager = RedisConnectionManager::initialize(RedisConfig {
             connection_strings: hash_map! {
@@ -58,7 +58,7 @@ impl MatchmakingMasterJob {
             matchmaking_waiting_time_dal,
             matchmaking_assembler,
             notification_manager,
-            shutown_receiver,
+            shutdown_receiver,
         })
     }
 
@@ -77,7 +77,7 @@ impl MatchmakingMasterJob {
                 self.matchmaking_assembler.clone(),
                 self.notification_manager.clone(),
                 self.matchmaking_settings_dal.clone(),
-                self.shutown_receiver.clone(),
+                self.shutdown_receiver.clone(),
             );
 
             set.spawn(async move { matchmaking_job.job_loop().await });

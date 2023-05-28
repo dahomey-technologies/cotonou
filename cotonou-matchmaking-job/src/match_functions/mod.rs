@@ -6,60 +6,29 @@ pub use mmr_match_functions::*;
 
 use cotonou_common::{
     matchmaking::{
-        matchmaking_session::MatchmakingSession,
-        matchmaking_ticket::{MatchmakingPlayer, MatchmakingTicket},
+        matchmaking_ticket::{MatchmakingPlayer},
     },
     models::GameModeConfig,
 };
 
-pub trait MatchFunctions: Send {
-    fn is_ticket_with_session_match(
+pub trait MatchFunctions: MatchFunctionsClone + Send {
+    fn is_match(
         &self,
         game_mode_config: &GameModeConfig,
-        ticket: &MatchmakingTicket,
-        session: &MatchmakingSession,
+        group1: &[MatchmakingPlayer],
+        group2: &[MatchmakingPlayer],
     ) -> bool {
-        if !is_size_player_match(
-            game_mode_config,
-            ticket.players.iter().chain(session.players.iter()),
-        ) {
+        if !is_in_bounds(game_mode_config, group1.iter().chain(group2.iter())) {
             return false;
         }
 
-        self.is_player_match(&ticket.players, &session.players)
+        self.calculate_match(group1, group2)
     }
 
-    //-------------------------------------------------------------------------------------------------
-    fn is_ticket_with_ticket_match(
-        &self,
-        game_mode_config: &GameModeConfig,
-        ticket1: &MatchmakingTicket,
-        ticket2: &MatchmakingTicket,
-    ) -> bool {
-        if !is_size_player_match(
-            game_mode_config,
-            ticket1.players.iter().chain(ticket2.players.iter()),
-        ) {
-            return false;
-        }
-
-        self.is_player_match(&ticket1.players, &ticket2.players)
-    }
-
-    //-------------------------------------------------------------------------------------------------
-    fn is_ticket_match(
-        &self,
-        game_mode_config: &GameModeConfig,
-        ticket: &MatchmakingTicket,
-    ) -> bool {
-        is_size_player_match(game_mode_config, ticket.players.iter())
-    }
-
-    //-------------------------------------------------------------------------------------------------
-    fn is_player_match(&self, group1: &[MatchmakingPlayer], group2: &[MatchmakingPlayer]) -> bool;
+    fn calculate_match(&self, group1: &[MatchmakingPlayer], group2: &[MatchmakingPlayer]) -> bool;
 }
 
-fn is_size_player_match<'b, I: Iterator<Item = &'b MatchmakingPlayer>>(
+pub fn is_in_bounds<'b, I: Iterator<Item = &'b MatchmakingPlayer>>(
     game_mode_config: &GameModeConfig,
     players: I,
 ) -> bool {
@@ -67,3 +36,22 @@ fn is_size_player_match<'b, I: Iterator<Item = &'b MatchmakingPlayer>>(
     num_players >= game_mode_config.min_players && num_players <= game_mode_config.max_players
 }
 
+/// cf. https://stackoverflow.com/questions/30353462/how-to-clone-a-struct-storing-a-boxed-trait-object
+pub trait MatchFunctionsClone {
+    fn clone_box(&self) -> Box<dyn MatchFunctions>;
+}
+
+impl<T> MatchFunctionsClone for T
+where
+    T: 'static + MatchFunctions + Clone,
+{
+    fn clone_box(&self) -> Box<dyn MatchFunctions> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn MatchFunctions> {
+    fn clone(&self) -> Box<dyn MatchFunctions> {
+        self.clone_box()
+    }
+}

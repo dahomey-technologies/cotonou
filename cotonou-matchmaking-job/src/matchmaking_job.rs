@@ -49,7 +49,7 @@ pub struct MatchmakingJob {
     matchmakers: HashMap<String, Box<dyn Matchmaker>>,
     matched_players: HashMap<ProfileId, SessionId>,
     activating_players: QueueMap<(ProfileId, SessionId)>,
-    shutown_receiver: tokio::sync::watch::Receiver<()>,
+    shutdown_receiver: tokio::sync::watch::Receiver<()>,
     can_create_new_sessions: bool,
 }
 
@@ -67,7 +67,7 @@ impl MatchmakingJob {
         matchmaking_assembler: MatchmakingAssembler,
         notification_manager: NotificationManager,
         matchmaking_settings_dal: MatchmakingSettingsDAL,
-        shutown_receiver: tokio::sync::watch::Receiver<()>,
+        shutdown_receiver: tokio::sync::watch::Receiver<()>,
     ) -> Self {
         Self {
             region_system_name: region_system_name.to_owned(),
@@ -80,7 +80,7 @@ impl MatchmakingJob {
             ),
             matchmaking_assembler,
             notification_cache: NotificationCache::new(notification_manager),
-            shutown_receiver,
+            shutdown_receiver,
             can_create_new_sessions: true,
             servers: GameServerManager::new(region_system_name, game_server_dal),
             tickets: ItemCache::new(region_system_name, matchmaking_ticket_dal),
@@ -114,7 +114,7 @@ impl MatchmakingJob {
             return Err(e);
         }
 
-        while !self.shutown_receiver.has_changed()? {
+        while !self.shutdown_receiver.has_changed()? {
             let start = Instant::now();
 
             self.process_commands().await?;
@@ -138,7 +138,7 @@ impl MatchmakingJob {
             }
         }
 
-        log::info!("MatchmakingJob stopped");
+        log::info!("MatchmakingJob loop stopped");
 
         Ok(())
     }

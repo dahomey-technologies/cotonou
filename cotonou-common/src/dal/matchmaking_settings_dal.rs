@@ -34,6 +34,18 @@ impl MatchmakingSettingsDAL {
                         max_players: 8,
                         team_player_count: 4,
                     },
+                    GameModeConfig {
+                        name: "MTRanked".to_owned(),
+                        short_name: "mtr".to_owned(),
+                        matchmaker_type: MatchmakerConfig::MultiThreadedCutLists,
+                        match_functions_type: MatchFunctionsConfig::Mmr {
+                            max_mmr_distance: 300,
+                            waiting_time_weight: 10,
+                        },
+                        min_players: 2,
+                        max_players: 8,
+                        team_player_count: 4,
+                    },
                 ],
                 supported_regions: vec![GameRegion {
                     region_system_name: "eu-central-1".to_owned(),
