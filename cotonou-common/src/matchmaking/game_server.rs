@@ -3,7 +3,7 @@ use crate::models::UniqueId;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub enum GameServerHostType {
     Dynamic = 1,
     Static = 2,
@@ -18,6 +18,8 @@ impl fmt::Display for GameServerHostType {
     }
 }
 
+pub type HostName = String;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GameServer {
     /// Game server unique id (uuid)
@@ -26,7 +28,7 @@ pub struct GameServer {
 
     /// Host name
     #[serde(rename = "ii")]
-    pub host_name: String,
+    pub host_name: HostName,
 
     /// Host type (0: Undefined, 1: Dynamic, 2: Static)
     #[serde(rename = "ht")]
@@ -63,6 +65,27 @@ pub struct GameServer {
     /// Last keep alive time (unix timestamp)
     #[serde(rename = "t")]
     pub keep_alive_time: u64,
+
+    /// Host shutdown request time (unix timestamp)
+    #[serde(rename = "hs")]
+    pub host_shutdown_request_time: u64,
+}
+
+impl GameServer {
+    #[inline]
+    pub fn is_busy(&self) -> bool {
+        self.session_id.is_some()
+    }
+
+    #[inline]
+    pub fn is_idle(&self) -> bool {
+        self.session_id.is_none()
+    }
+
+    #[inline]
+    pub fn is_stopping(&self) -> bool {
+        self.host_shutdown_request_time != 0
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]

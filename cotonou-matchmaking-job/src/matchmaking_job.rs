@@ -486,6 +486,7 @@ impl MatchmakingJob {
             port,
             session_id: None,
             keep_alive_time: unix_now(),
+            host_shutdown_request_time: 0,
         };
 
         log::trace!("[{}] Game server id={}, ip_address={}, port={}, host_name={}, host_boot_time={}, host_provider={}, host_type={}, process_id={}, game_version={} initialized",

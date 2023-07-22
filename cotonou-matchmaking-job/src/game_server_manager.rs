@@ -55,6 +55,7 @@ impl GameServerManager {
         self.servers.reset().await
     }
 
+    /// # Returns SessionIds to delete of the expired servers that were assigned a session
     pub fn process_expired_servers(&mut self) -> Vec<SessionId> {
         let keep_alive_timeout = GAME_SERVER_TIMEOUT.as_secs();
 

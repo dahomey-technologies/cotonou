@@ -15,6 +15,7 @@ mod matchmaking_waiting_time_cache;
 mod notification_cache;
 mod queue_map;
 mod util;
+mod game_server_provider;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
