@@ -1,14 +1,11 @@
+use crate::error::Error;
 use cotonou_common::{
-    matchmaking::matchmaking_ticket::{
-        MatchmakingPlayer, MatchmakingTicket,
-    },
+    matchmaking::matchmaking_ticket::{MatchmakingPlayer, MatchmakingTicket},
     matchmaking_average_waiting_time_dal::MatchmakingWaitingTimeDAL,
     unix_now,
 };
 use futures_util::future;
-use std::{collections::VecDeque};
-
-use crate::error::Error;
+use std::collections::VecDeque;
 
 const MAX_WAITING_QUEUE_SIZE: usize = 10;
 
@@ -103,10 +100,8 @@ impl MatchmakingWaitingTimeCache {
             .waiting_time_infos
             .iter()
             .map(|i| {
-                self.matchmaking_waiting_time_dal.reset(
-                    &self.region_system_name,
-                    &i.game_mode,
-                )
+                self.matchmaking_waiting_time_dal
+                    .reset(&self.region_system_name, &i.game_mode)
             })
             .collect::<Vec<_>>();
         let results = future::join_all(tasks).await;
