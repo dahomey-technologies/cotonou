@@ -9,7 +9,7 @@ use rustis::{
 };
 use std::{result, time::Duration};
 
-pub type Result<T> = result::Result<T, Error>;
+type Result<T> = result::Result<T, Error>;
 
 #[derive(Clone)]
 pub struct NotificationManager {
@@ -74,11 +74,10 @@ impl NotificationManager {
         let msg = tokio::time::timeout(timeout, messages.next()).await;
 
         match msg {
-            Ok(msg) => match msg {
-                Some(_) => self.get_notifications_from_queue(channel_name).await,
-                // stream closed
-                None => Ok(Vec::new()),
-            },
+            // message
+            Ok(Some(_msg)) => self.get_notifications_from_queue(channel_name).await,
+            // stream closed
+            Ok(None) => Ok(Vec::new()),
             // timeout
             Err(_e) => Ok(Vec::new()),
         }
