@@ -1,6 +1,6 @@
 use crate::{
-    database::MasterEntity, mongo_db::MongoDbCollection,
-    profile::{profile_entity, ProfileId}, profile::Platform,
+    database::MasterEntity, mongo_db::MongoDbCollection, profile::profile_entity,
+    profile::Platform, types::ProfileId,
 };
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};

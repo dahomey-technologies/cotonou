@@ -13,7 +13,7 @@ use mongodb::{
 use serde::{de::DeserializeOwned, Serialize};
 use std::result;
 
-pub type Result<T> = result::Result<T, Error>;
+type Result<T> = result::Result<T, Error>;
 
 #[derive(Clone)]
 pub struct GenericDAL {

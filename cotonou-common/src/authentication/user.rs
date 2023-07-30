@@ -1,4 +1,4 @@
-use crate::{authentication::JwtRole, profile::ProfileId};
+use crate::{authentication::JwtRole, types::ProfileId};
 
 #[derive(Debug, Clone)]
 pub struct User {

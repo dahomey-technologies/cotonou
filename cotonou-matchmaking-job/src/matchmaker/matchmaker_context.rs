@@ -1,7 +1,7 @@
 use crate::{MatchmakingAssembler, QueueMap, SessionCache, TicketCache};
 use cotonou_common::{
     matchmaking::{MatchmakingSession, MatchmakingSessionStatus, MatchmakingTicket, SessionId},
-    profile::ProfileId,
+    types::ProfileId,
     unix_now,
 };
 use std::collections::HashMap;

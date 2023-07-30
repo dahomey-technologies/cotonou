@@ -2,9 +2,9 @@ use crate::Error;
 use axum::{extract::State, http::HeaderMap, Extension, Json};
 use cotonou_common::{
     authentication::{get_authorization, JwtClaims, JwtRole, User},
-    matchmaking::GameServerId,
     profile::{AccountEntity, AccountManager, CoreProfileEntity, CoreProfileManager},
     steam::{self, SteamId, SteamMicroTxnClient, SteamUserAuthClient, SteamUserClient},
+    types::GameServerId,
     unix_now,
 };
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};

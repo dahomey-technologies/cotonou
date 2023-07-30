@@ -5,7 +5,7 @@ use crate::{
 use rustis::{client::Client, commands::ListCommands};
 use std::result;
 
-pub type Result<T> = result::Result<T, Error>;
+type Result<T> = result::Result<T, Error>;
 
 #[derive(Clone)]
 pub struct MatchmakingCommandDAL {

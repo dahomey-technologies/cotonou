@@ -1,5 +1,6 @@
 #[cfg(debug_assertions)]
-use crate::{AppState, Error};
+use crate::AppState;
+use crate::Error;
 use axum::{
     extract::{Path, State},
     Extension, Json,
@@ -7,9 +8,10 @@ use axum::{
 use cotonou_common::{
     authentication::User,
     matchmaking::{
-        GameServerDAL, GameServerHostType, GameServerId, MatchmakingCommand, MatchmakingCommandDAL,
+        GameServerDAL, GameServerHostType, MatchmakingCommand, MatchmakingCommandDAL,
         MatchmakingSettingsDAL,
     },
+    types::GameServerId,
 };
 use serde::Deserialize;
 use std::sync::Arc;

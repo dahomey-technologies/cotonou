@@ -13,5 +13,8 @@ jsonwebtoken = { version = "8" }
 thiserror = "1.0"
 cotonou-common = { path = "../cotonou-common", default-features = false, features = [
     "authentication",
+    "database",
+    "http",
     "profile",
+    "steam",
 ] }

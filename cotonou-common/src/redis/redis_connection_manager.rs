@@ -5,7 +5,7 @@ pub struct RedisConnectionManager {
     clients: HashMap<String, rustis::client::Client>,
 }
 
-pub type Result<T> = result::Result<T, Error>;
+type Result<T> = result::Result<T, Error>;
 
 impl RedisConnectionManager {
     pub async fn initialize(redis_config: RedisConfig) -> Result<Self> {

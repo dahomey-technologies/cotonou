@@ -6,7 +6,7 @@ use crate::{
 };
 use cotonou_common::{
     matchmaking::{GameModeConfig, MatchmakingSession, MatchmakingTicket, SessionId},
-    profile::ProfileId,
+    types::ProfileId,
 };
 use std::iter::repeat;
 

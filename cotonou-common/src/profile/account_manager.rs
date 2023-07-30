@@ -5,7 +5,7 @@ use crate::{
 use mongodb::bson::DateTime;
 use std::result;
 
-pub type Result<T> = result::Result<T, Error>;
+type Result<T> = result::Result<T, Error>;
 
 #[derive(Clone)]
 pub struct AccountManager {

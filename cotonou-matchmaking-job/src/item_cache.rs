@@ -1,7 +1,7 @@
 use crate::{Error, MatchmakingDAL};
 use cotonou_common::{
-    matchmaking::{GameServer, GameServerId, MatchmakingSession, MatchmakingTicket, SessionId},
-    profile::ProfileId,
+    matchmaking::{GameServer, MatchmakingSession, MatchmakingTicket, SessionId},
+    types::{GameServerId, ProfileId},
 };
 use std::{
     collections::{HashMap, HashSet},

@@ -1,5 +1,5 @@
 #[cfg(debug_assertions)]
-use crate::app_state::AppState;
+use crate::AppState;
 use crate::{
     Error, MatchmakingAssembler,
     MatchmakingStartedNotification,
@@ -16,7 +16,7 @@ use cotonou_common::{
         MatchmakingSettingsDAL, MatchmakingTicketDAL, MatchmakingWaitingTimeDAL, SessionId,
     },
     notifications::NotificationManager,
-    profile::ProfileId,
+    types::ProfileId,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;

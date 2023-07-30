@@ -1,7 +1,4 @@
-use cotonou_common::{
-    profile::{profile_entity, ProfileId},
-    mongo_db::MongoDbCollection,
-};
+use cotonou_common::{mongo_db::MongoDbCollection, profile::profile_entity, types::ProfileId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 

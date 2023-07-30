@@ -5,7 +5,7 @@ use crate::{
 };
 use cotonou_common::{
     matchmaking::{GameModeConfig, MatchmakingSession, MatchmakingTicket, SessionId},
-    profile::ProfileId,
+    types::ProfileId,
 };
 
 pub struct SimpleListMatchmaker {

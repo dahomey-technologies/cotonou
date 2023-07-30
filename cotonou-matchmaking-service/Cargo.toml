@@ -18,7 +18,6 @@ env_logger = "0.10"
 thiserror = "1.0"
 cotonou-common = { path = "../cotonou-common", default-features = false, features = [
     "authentication",
-    "profile",
     "notifications",
     "matchmaking",
 ] }

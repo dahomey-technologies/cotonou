@@ -8,7 +8,7 @@ use crate::{
 use cotonou_common::{
     matchmaking::{
         GameServerDAL,
-        GameServer, GameServerHostType, GameServerId,
+        GameServer, GameServerHostType,
         MatchmakingCommand,
         MatchmakingCommandDAL,
         MatchmakingTicket, MatchmakingPlayerStatus, MatchmakingPlayer,
@@ -24,7 +24,7 @@ use cotonou_common::{
     },
     notifications::NotificationManager,
     unix_now,
-    profile::ProfileId,
+    types::{GameServerId, ProfileId},
 };
 use std::{time::Duration, collections::HashMap};
 use tokio::time::Instant;

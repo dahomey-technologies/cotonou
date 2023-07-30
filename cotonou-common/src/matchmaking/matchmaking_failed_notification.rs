@@ -1,4 +1,4 @@
-use crate::{notifications::Notification, profile::ProfileId};
+use crate::{notifications::Notification, types::ProfileId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]

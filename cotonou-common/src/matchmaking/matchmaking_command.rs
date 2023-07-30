@@ -1,9 +1,7 @@
 use crate::{
-    matchmaking::{
-        game_server::{GameServerHostType, GameServerId},
-        matchmaking_ticket::MatchmakingTicket,
-    },
-    profile::ProfileId,
+    matchmaking::{game_server::GameServerHostType, matchmaking_ticket::MatchmakingTicket},
+    types::GameServerId,
+    types::ProfileId,
 };
 use serde::{Deserialize, Serialize};
 

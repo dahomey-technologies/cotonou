@@ -1,5 +1,5 @@
 use cotonou_common::{
-    profile::ProfileId,
+    types::ProfileId,
     notifications::Notification,
 };
 use serde::{Deserialize, Serialize};

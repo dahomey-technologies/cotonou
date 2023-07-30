@@ -2,9 +2,11 @@
 pub mod authentication;
 #[cfg(feature = "database")]
 pub mod database;
+#[cfg(feature = "http")]
 pub mod http;
 #[cfg(feature = "matchmaking")]
 pub mod matchmaking;
+#[cfg(feature = "database")]
 pub mod mongo_db;
 #[cfg(feature = "notifications")]
 pub mod notifications;
@@ -12,10 +14,10 @@ pub mod notifications;
 pub mod profile;
 #[cfg(feature = "redis")]
 pub mod redis;
+#[cfg(feature = "steam")]
 pub mod steam;
-mod unique_id;
+pub mod types;
 
-pub use crate::unique_id::*;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{de, Deserialize, Deserializer};
 

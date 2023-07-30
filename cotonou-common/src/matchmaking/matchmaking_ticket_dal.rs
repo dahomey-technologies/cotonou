@@ -1,6 +1,6 @@
 use crate::{
     matchmaking::{Error, MatchmakingTicket},
-    profile::ProfileId,
+    types::ProfileId,
     redis::RedisConnectionManager,
 };
 use rustis::{

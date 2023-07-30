@@ -1,5 +1,5 @@
+use crate::types::GameServerId;
 use super::matchmaking_session::SessionId;
-use crate::UniqueId;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -65,69 +65,30 @@ pub struct GameServer {
     pub keep_alive_time: u64,
 }
 
-#[derive(Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
-pub struct GameServerId(UniqueId);
-
-impl GameServerId {
-    pub fn new() -> Self {
-        Self(UniqueId::new())
-    }
-
-    pub fn try_parse(input: &str) -> Option<Self> {
-        UniqueId::try_parse(input).map(Self)
-    }
-}
-
-impl Default for GameServerId {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl fmt::Display for GameServerId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-#[cfg(feature = "redis")]
-impl rustis::resp::ToArgs for GameServerId {
-    fn write_args(&self, args: &mut rustis::resp::CommandArgs) {
-        args.arg(self.0);
-    }
-}
-
-#[cfg(feature = "redis")]
-impl rustis::resp::SingleArg for GameServerId {}
-
-#[cfg(feature = "redis")]
-impl rustis::resp::PrimitiveResponse for GameServerId {}
-
 #[cfg(feature = "matchmaking")]
 #[cfg(test)]
 mod tests {
-    use super::GameServerId;
-    use crate::UniqueId;
+    use crate::types::{GameServerId, UniqueId};
 
     const TEST_UUID: &str = "1f6cf4f5d977453394c6ba33b7a3e299";
 
     #[test]
     fn debug() {
-        let server_id = GameServerId(UniqueId::try_parse(TEST_UUID).unwrap());
+        let server_id: GameServerId = UniqueId::try_parse(TEST_UUID).unwrap().into();
         let str = format!("{server_id:?}");
         assert_eq!(format!("GameServerId({TEST_UUID})"), str);
     }
 
     #[test]
     fn display() {
-        let server_id = GameServerId(UniqueId::try_parse(TEST_UUID).unwrap());
+        let server_id: GameServerId = UniqueId::try_parse(TEST_UUID).unwrap().into();
         let str = server_id.to_string();
         assert_eq!(TEST_UUID, str);
     }
 
     #[test]
     fn deserialize() {
-        let expected_id = GameServerId(UniqueId::try_parse(TEST_UUID).unwrap());
+        let expected_id: GameServerId = UniqueId::try_parse(TEST_UUID).unwrap().into();
         let actual_id = serde_json::from_str::<GameServerId>(&format!("\"{TEST_UUID}\"")).unwrap();
         assert_eq!(expected_id, actual_id);
 
@@ -140,7 +101,7 @@ mod tests {
     fn serialize() {
         let expected_id = format!("\"{TEST_UUID}\"");
         let actual_id =
-            serde_json::to_string(&GameServerId(UniqueId::try_parse(TEST_UUID).unwrap())).unwrap();
+            serde_json::to_string(&GameServerId::from(UniqueId::try_parse(TEST_UUID).unwrap())).unwrap();
         assert_eq!(expected_id, actual_id);
     }
 }

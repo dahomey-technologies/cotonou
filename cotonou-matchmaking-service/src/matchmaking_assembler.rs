@@ -1,7 +1,7 @@
 use crate::{CreateMatchmakingTicketRequest, ProfileForMatchmakingEntity};
 use cotonou_common::{
     matchmaking::{MatchmakingPlayer, MatchmakingPlayerStatus, MatchmakingTicket},
-    profile::ProfileId,
+    types::ProfileId,
     unix_now,
 };
 

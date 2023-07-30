@@ -1,6 +1,7 @@
 use crate::{
-    matchmaking::{Error, GameServer, GameServerId},
+    matchmaking::{Error, GameServer},
     redis::RedisConnectionManager,
+    types::GameServerId,
 };
 use rustis::{
     client::Client,

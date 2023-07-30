@@ -8,7 +8,7 @@ use cotonou_common::{
     matchmaking::{
         GameModeConfig, MatchmakingPlayer, MatchmakingSession, MatchmakingTicket, SessionId,
     },
-    profile::ProfileId,
+    types::ProfileId,
 };
 use std::{
     collections::HashMap,

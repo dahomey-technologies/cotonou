@@ -21,5 +21,4 @@ thiserror = "1.0"
 cotonou-common = { path = "../cotonou-common", default-features = false, features = [
     "notifications",
     "matchmaking",
-    "database",
 ] }

@@ -1,6 +1,7 @@
 use crate::{Error, ItemCache, QueueMap};
 use cotonou_common::{
-    matchmaking::{GameServer, GameServerDAL, GameServerId, SessionId},
+    matchmaking::{GameServer, GameServerDAL, SessionId},
+    types::GameServerId,
     unix_now,
 };
 use std::{collections::HashSet, time::Duration};

@@ -1,10 +1,11 @@
 use crate::{
     database::{master_entity, GenericDAL},
-    profile::{profile_entity, CoreProfileEntity, Error, ProfileId},
+    profile::{profile_entity, CoreProfileEntity, Error},
+    types::ProfileId,
 };
 use std::result;
 
-pub type Result<T> = result::Result<T, Error>;
+type Result<T> = result::Result<T, Error>;
 
 #[derive(Clone)]
 pub struct CoreProfileManager {

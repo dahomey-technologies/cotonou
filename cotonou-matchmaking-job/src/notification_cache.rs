@@ -1,8 +1,7 @@
 use crate::Error;
 use cotonou_common::{
-    matchmaking::GameServerId,
     notifications::{Notification, NotificationManager},
-    profile::ProfileId,
+    types::{GameServerId, ProfileId},
 };
 use std::collections::VecDeque;
 
