@@ -3,7 +3,7 @@ use crate::{
         game_server::{GameServerHostType, GameServerId},
         matchmaking_ticket::MatchmakingTicket,
     },
-    models::ProfileId,
+    profile::ProfileId,
 };
 use serde::{Deserialize, Serialize};
 

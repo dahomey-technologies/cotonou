@@ -1,4 +1,4 @@
-use crate::notifications::notification::Notification;
+use crate::notifications::Notification;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]

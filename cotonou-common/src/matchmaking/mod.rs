@@ -1,20 +1,37 @@
-#[cfg(feature = "matchmaking")]
-pub mod game_server;
-#[cfg(feature = "matchmaking")]
-pub mod matchmaking_command;
-#[cfg(feature = "matchmaking")]
-pub mod matchmaking_command_dal;
-#[cfg(feature = "matchmaking")]
-pub mod matchmaking_completed_notification;
-#[cfg(feature = "matchmaking")]
-pub mod matchmaking_failed_notification;
-#[cfg(feature = "matchmaking")]
-pub mod matchmaking_servers_full_notification;
-#[cfg(feature = "matchmaking")]
-pub mod matchmaking_session;
-#[cfg(feature = "matchmaking")]
-pub mod matchmaking_ticket;
-#[cfg(feature = "matchmaking")]
-pub mod redis_key_names;
-#[cfg(feature = "matchmaking")]
-pub mod matchmaking_activate_session_notification;
+mod error;
+mod game_region;
+mod game_server;
+mod game_server_dal;
+mod matchmaking_activate_session_notification;
+mod matchmaking_average_waiting_time_dal;
+mod matchmaking_command;
+mod matchmaking_command_dal;
+mod matchmaking_completed_notification;
+mod matchmaking_failed_notification;
+mod matchmaking_servers_full_notification;
+mod matchmaking_session;
+mod matchmaking_session_dal;
+mod matchmaking_settings;
+mod matchmaking_settings_dal;
+mod matchmaking_ticket;
+mod matchmaking_ticket_dal;
+mod redis_key_names;
+
+pub use error::*;
+pub use game_region::*;
+pub use game_server::*;
+pub use game_server_dal::*;
+pub use matchmaking_activate_session_notification::*;
+pub use matchmaking_average_waiting_time_dal::*;
+pub use matchmaking_command::*;
+pub use matchmaking_command_dal::*;
+pub use matchmaking_completed_notification::*;
+pub use matchmaking_failed_notification::*;
+pub use matchmaking_servers_full_notification::*;
+pub use matchmaking_session::*;
+pub use matchmaking_session_dal::*;
+pub use matchmaking_settings::*;
+pub use matchmaking_settings_dal::*;
+pub use matchmaking_ticket::*;
+pub use matchmaking_ticket_dal::*;
+pub use redis_key_names::*;

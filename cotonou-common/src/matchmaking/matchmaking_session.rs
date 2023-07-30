@@ -1,5 +1,5 @@
 use super::{game_server::GameServerId, matchmaking_ticket::MatchmakingPlayer};
-use crate::models::UniqueId;
+use crate::UniqueId;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 

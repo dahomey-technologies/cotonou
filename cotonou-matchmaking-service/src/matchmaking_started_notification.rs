@@ -1,6 +1,6 @@
 use cotonou_common::{
-    models::ProfileId,
-    notifications::notification::Notification,
+    profile::ProfileId,
+    notifications::Notification,
 };
 use serde::{Deserialize, Serialize};
 

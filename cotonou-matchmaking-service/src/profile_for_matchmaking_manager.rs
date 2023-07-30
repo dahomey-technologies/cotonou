@@ -1,9 +1,7 @@
-use crate::profile_for_matchmaking_entity::ProfileForMatchmakingEntity;
+use crate::{ProfileForMatchmakingEntity, Error};
 use cotonou_common::{
-    generic_dal::{self, GenericDAL},
-    master_entity,
-    models::ProfileId,
-    profile_entity,
+    database::{master_entity, GenericDAL},
+    profile::{profile_entity, ProfileId},
 };
 use std::result;
 
@@ -13,17 +11,6 @@ pub struct ProfileForMatchmakingManager {
 }
 
 pub type Result<T> = result::Result<T, Error>;
-
-pub enum Error {
-    Database,
-}
-
-impl From<generic_dal::Error> for Error {
-    fn from(_: generic_dal::Error) -> Self {
-        println!("ProfileForMatchmakingManager: error from database");
-        Error::Database
-    }
-}
 
 impl ProfileForMatchmakingManager {
     pub fn new(generic_dal: GenericDAL) -> ProfileForMatchmakingManager {

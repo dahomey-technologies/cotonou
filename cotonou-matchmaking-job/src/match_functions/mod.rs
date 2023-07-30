@@ -1,15 +1,9 @@
-mod fcfs_march_functions;
-mod mmr_match_functions;
-
+use cotonou_common::matchmaking::{GameModeConfig, MatchmakingPlayer};
 pub use fcfs_march_functions::*;
 pub use mmr_match_functions::*;
 
-use cotonou_common::{
-    matchmaking::{
-        matchmaking_ticket::{MatchmakingPlayer},
-    },
-    models::GameModeConfig,
-};
+mod fcfs_march_functions;
+mod mmr_match_functions;
 
 pub trait MatchFunctions: MatchFunctionsClone + Send {
     fn is_match(

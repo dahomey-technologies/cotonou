@@ -1,14 +1,7 @@
-use crate::{
-    matchmaking_assembler::MatchmakingAssembler,
-    matchmaking_job::{SessionCache, TicketCache},
-    queue_map::QueueMap,
-};
+use crate::{MatchmakingAssembler, QueueMap, SessionCache, TicketCache};
 use cotonou_common::{
-    matchmaking::{
-        matchmaking_session::{MatchmakingSession, MatchmakingSessionStatus, SessionId},
-        matchmaking_ticket::MatchmakingTicket,
-    },
-    models::ProfileId,
+    matchmaking::{MatchmakingSession, MatchmakingSessionStatus, MatchmakingTicket, SessionId},
+    profile::ProfileId,
     unix_now,
 };
 use std::collections::HashMap;
@@ -74,7 +67,11 @@ impl<'a> MatchmakerContext<'a> {
         self.sessions.update(session_id);
     }
 
-    pub fn match_tickets_to_new_session(&mut self, session_id: SessionId, tickets_to_match: &[ProfileId]) {
+    pub fn match_tickets_to_new_session(
+        &mut self,
+        session_id: SessionId,
+        tickets_to_match: &[ProfileId],
+    ) {
         let Some(ticket) = self.tickets.get(&tickets_to_match[0]) else {
             unreachable!()
         };

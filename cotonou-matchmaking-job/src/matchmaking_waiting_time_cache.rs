@@ -1,7 +1,6 @@
-use crate::error::Error;
+use crate::Error;
 use cotonou_common::{
-    matchmaking::matchmaking_ticket::{MatchmakingPlayer, MatchmakingTicket},
-    matchmaking_average_waiting_time_dal::MatchmakingWaitingTimeDAL,
+    matchmaking::{MatchmakingPlayer, MatchmakingTicket, MatchmakingWaitingTimeDAL},
     unix_now,
 };
 use futures_util::future;

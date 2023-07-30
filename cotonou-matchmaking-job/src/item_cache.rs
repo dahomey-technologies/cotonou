@@ -1,13 +1,8 @@
+use crate::{Error, MatchmakingDAL};
 use cotonou_common::{
-    matchmaking::{
-        game_server::{GameServer, GameServerId},
-        matchmaking_session::{MatchmakingSession, SessionId},
-        matchmaking_ticket::MatchmakingTicket,
-    },
-    models::ProfileId,
+    matchmaking::{GameServer, GameServerId, MatchmakingSession, MatchmakingTicket, SessionId},
+    profile::ProfileId,
 };
-
-use crate::{error::Error, matchmaking_dal::MatchmakingDAL};
 use std::{
     collections::{HashMap, HashSet},
     fmt::Display,

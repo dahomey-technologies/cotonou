@@ -1,20 +1,15 @@
 use crate::{
-    game_server_service::{initialize_game_server, keep_alive_game_server, shutdown_game_server},
-    health_check_service::health_check,
-    matchmaking_service::{
-        activate_player_session, activate_session, create_matchmaking_ticket,
-        delete_matchmaking_ticket, delete_player_session, delete_session, update_session,
-    },
+    app_state::*, error::*, game_server_service::*, health_check_service::*,
+    matchmaking_assembler::*, matchmaking_service::*, matchmaking_started_notification::*,
+    profile_for_matchmaking_entity::*, profile_for_matchmaking_manager::*,
 };
-use app_state::AppState;
 use axum::{
     middleware,
     routing::{get, post, put},
     Router,
 };
-use cotonou_common::jwt_auth_middleware::{jwt_auth_middleware, JwtSecret};
-use error::Error;
-use std::net::SocketAddr;
+use cotonou_common::authentication::{jwt_auth_middleware, JwtSecret};
+use std::{net::SocketAddr, result::Result};
 
 mod app_state;
 mod error;

@@ -1,27 +1,15 @@
-use super::notification::Notification;
-use crate::redis::redis_connection_manager::RedisConnectionManager;
+use crate::{
+    notifications::{Error, Notification},
+    redis::RedisConnectionManager,
+};
 use futures::StreamExt;
-use rustis::{client::Client, commands::{ListCommands, PubSubCommands, GenericCommands}};
+use rustis::{
+    client::Client,
+    commands::{GenericCommands, ListCommands, PubSubCommands},
+};
 use std::{result, time::Duration};
 
 pub type Result<T> = result::Result<T, Error>;
-
-#[derive(Debug)]
-pub struct Error;
-
-impl From<rustis::Error> for Error {
-    fn from(redis_error: rustis::Error) -> Self {
-        println!("Redis Error: {:?}", redis_error);
-        Error
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(json_error: serde_json::Error) -> Self {
-        println!("Json Error: {:?}", json_error);
-        Error
-    }
-}
 
 #[derive(Clone)]
 pub struct NotificationManager {
@@ -58,7 +46,10 @@ impl NotificationManager {
         // data is not sent via pub/sub; the pub/sub API is used only to notify subscriber to check for new notifications
         // the actual data is pushed into a list used as a queue
         self.regular
-            .lpush(self.build_channel_queue_key(channel_name), notification.to_owned())
+            .lpush(
+                self.build_channel_queue_key(channel_name),
+                notification.to_owned(),
+            )
             .await?;
         self.regular.publish(channel_name.to_owned(), "new").await?;
         Ok(())

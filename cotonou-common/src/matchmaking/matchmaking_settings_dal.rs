@@ -1,4 +1,4 @@
-use crate::models::{
+use crate::matchmaking::{
     GameModeConfig, GameRegion, MatchFunctionsConfig, MatchmakerConfig, MatchmakingSettings,
 };
 use std::sync::Arc;

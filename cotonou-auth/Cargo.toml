@@ -11,4 +11,7 @@ hyper-tls = { version = "0.5" }
 axum = { version = "0.6", features = ["macros"] }
 jsonwebtoken = { version = "8" }
 thiserror = "1.0"
-cotonou-common = { path = "../cotonou-common", features = ["authentication", "profile"] }
+cotonou-common = { path = "../cotonou-common", default-features = false, features = [
+    "authentication",
+    "profile",
+] }

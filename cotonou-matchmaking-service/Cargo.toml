@@ -15,4 +15,10 @@ axum = { version = "0.6", features = ["macros"] }
 typetag = "0"
 log = "0.4"
 env_logger = "0.10"
-cotonou-common = { path = "../cotonou-common", features = ["authentication", "profile", "notifications", "matchmaking"] }
+thiserror = "1.0"
+cotonou-common = { path = "../cotonou-common", default-features = false, features = [
+    "authentication",
+    "profile",
+    "notifications",
+    "matchmaking",
+] }

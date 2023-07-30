@@ -1,25 +1,8 @@
-use crate::redis::redis_connection_manager::RedisConnectionManager;
+use crate::{matchmaking::Error, redis::RedisConnectionManager};
 use rustis::{
     client::Client,
     commands::{GenericCommands, StringCommands},
 };
-
-pub enum Error {
-    Redis(rustis::Error),
-    Json(serde_json::Error),
-}
-
-impl From<rustis::Error> for Error {
-    fn from(error: rustis::Error) -> Self {
-        Error::Redis(error)
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(error: serde_json::Error) -> Self {
-        Error::Json(error)
-    }
-}
 
 #[derive(Clone)]
 pub struct MatchmakingWaitingTimeDAL {

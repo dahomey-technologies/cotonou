@@ -1,12 +1,9 @@
 use crate::error::Error;
 use axum::extract::FromRef;
 use cotonou_common::{
-    account_manager::AccountManager,
-    core_profile_manager::CoreProfileManager,
-    generic_dal::GenericDAL,
-    id_generator_dal::IdGeneratorDAL,
-    models::HostingEnvironment,
-    mongo::mongo_config::MongoConfig,
+    profile::{AccountManager, CoreProfileManager},
+    database::{GenericDAL, IdGeneratorDAL},
+    mongo_db::MongoDbConfig,
     steam::{SteamMicroTxnClient, SteamUserAuthClient, SteamUserClient}, http::HttpClient,
 };
 use hyper_tls::HttpsConnector;
@@ -14,7 +11,7 @@ use std::sync::Arc;
 
 #[derive(Clone, FromRef)]
 pub struct AppState {
-    hosting_environment: HostingEnvironment,
+    is_development: bool,
     account_manager: Arc<AccountManager>,
     core_profile_manager: Arc<CoreProfileManager>,
     steam_user_auth_client: Arc<SteamUserAuthClient>,
@@ -24,7 +21,7 @@ pub struct AppState {
 
 impl AppState {
     pub async fn new() -> Result<AppState, Error> {
-        let generic_dal = GenericDAL::initialize(&MongoConfig {
+        let generic_dal = GenericDAL::initialize(&MongoDbConfig {
             connection_string: "mongodb://mongo:27017/test".to_owned(),
         })
         .await?;
@@ -45,7 +42,7 @@ impl AppState {
         let steam_micro_tnx_client = SteamMicroTxnClient::new(http_client);
 
         Ok(Self {
-            hosting_environment: HostingEnvironment::Dev,
+            is_development: true,
             account_manager: Arc::new(account_manager),
             core_profile_manager: Arc::new(core_profile_manager),
             steam_user_auth_client: Arc::new(steam_user_auth_client),

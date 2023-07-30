@@ -8,8 +8,18 @@ edition = "2021"
 [dependencies]
 common_macros = "0"
 futures-util = "0.3"
-tokio = { version = "1.26", features = ["rt-multi-thread", "signal", "time", "sync"] }
+tokio = { version = "1.26", features = [
+    "rt-multi-thread",
+    "signal",
+    "time",
+    "sync",
+] }
 log = "0.4"
 env_logger = "0.10"
 rand = "0.8"
-cotonou-common = { path = "../cotonou-common", features = ["authentication", "notifications", "matchmaking", "dal"] }
+thiserror = "1.0"
+cotonou-common = { path = "../cotonou-common", default-features = false, features = [
+    "notifications",
+    "matchmaking",
+    "database",
+] }

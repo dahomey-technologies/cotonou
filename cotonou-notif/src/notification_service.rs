@@ -1,6 +1,8 @@
-use crate::error::Error;
+use crate::Error;
 use axum::{extract::State, response::Response, Extension};
-use cotonou_common::{notifications::notification_manager::NotificationManager, user::User};
+use cotonou_common::{
+    authentication::User, notifications::NotificationManager,
+};
 use hyper::StatusCode;
 use std::{sync::Arc, time::Duration};
 

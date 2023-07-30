@@ -1,14 +1,10 @@
-use crate::error::Error;
+use crate::Error;
 use cotonou_common::{
-    game_server_dal::GameServerDAL,
     matchmaking::{
-        game_server::{GameServer, GameServerId},
-        matchmaking_session::{MatchmakingSession, SessionId},
-        matchmaking_ticket::MatchmakingTicket,
+        GameServer, GameServerDAL, GameServerId, MatchmakingSession, MatchmakingSessionDAL,
+        MatchmakingTicket, MatchmakingTicketDAL, SessionId,
     },
-    matchmaking_session_dal::MatchmakingSessionDAL,
-    matchmaking_ticket_dal::MatchmakingTicketDAL,
-    models::ProfileId,
+    profile::ProfileId,
 };
 use futures_util::future::BoxFuture;
 

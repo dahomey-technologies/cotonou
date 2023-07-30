@@ -1,6 +1,7 @@
-#[cfg(feature = "redis")]
-//pub mod paired_connection_ext;
-#[cfg(feature = "redis")]
-pub mod redis_config;
-#[cfg(feature = "redis")]
-pub mod redis_connection_manager;
+mod error;
+mod redis_config;
+mod redis_connection_manager;
+
+pub use error::*;
+pub use redis_config::*;
+pub use redis_connection_manager::*;

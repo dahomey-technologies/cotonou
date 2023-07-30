@@ -1,30 +1,13 @@
-use std::iter::once;
-
 use crate::{
-    matchmaking::matchmaking_ticket::MatchmakingTicket, models::ProfileId,
-    redis::redis_connection_manager::RedisConnectionManager,
+    matchmaking::{Error, MatchmakingTicket},
+    profile::ProfileId,
+    redis::RedisConnectionManager,
 };
 use rustis::{
     client::Client,
     commands::{GenericCommands, SortedSetCommands, StringCommands},
 };
-
-pub enum Error {
-    Redis(rustis::Error),
-    Json(serde_json::Error),
-}
-
-impl From<rustis::Error> for Error {
-    fn from(error: rustis::Error) -> Self {
-        Error::Redis(error)
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(error: serde_json::Error) -> Self {
-        Error::Json(error)
-    }
-}
+use std::iter::once;
 
 #[derive(Clone)]
 pub struct MatchmakingTicketDAL {

@@ -1,18 +1,21 @@
-mod authentication;
-mod dal;
+#[cfg(feature = "authentication")]
+pub mod authentication;
+#[cfg(feature = "database")]
+pub mod database;
 pub mod http;
+#[cfg(feature = "matchmaking")]
 pub mod matchmaking;
-pub mod models;
-pub mod mongo;
+pub mod mongo_db;
+#[cfg(feature = "notifications")]
 pub mod notifications;
-mod profile;
+#[cfg(feature = "profile")]
+pub mod profile;
+#[cfg(feature = "redis")]
 pub mod redis;
 pub mod steam;
+mod unique_id;
 
-pub use authentication::*;
-pub use dal::*;
-pub use profile::*;
-
+pub use crate::unique_id::*;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{de, Deserialize, Deserializer};
 

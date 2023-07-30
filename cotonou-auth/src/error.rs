@@ -2,27 +2,29 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use cotonou_common::{account_manager, core_profile_manager, steam};
+use cotonou_common::{database, profile, steam};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("InvalidScheme error")]
+    #[error("InvalidScheme Error")]
     InvalidScheme,
-    #[error("InvalidScheme NoAuthorizeHeader")]
+    #[error("NoAuthorizeHeader Error")]
     NoAuthorizeHeader,
-    #[error("InvalidScheme Unauthorized")]
+    #[error("Unauthorized Error")]
     Unauthorized,
-    #[error("InvalidScheme Forbidden")]
+    #[error("Forbidden Error")]
     Forbidden,
-    #[error("InvalidScheme InvalidExpirationTime")]
+    #[error("InvalidExpirationTime Error")]
     InvalidExpirationTime,
-    #[error("InvalidScheme CannotEncodeJwt")]
-    CannotEncodeJwt,
-    #[error("InvalidScheme Database")]
-    Database,
+    #[error("CannotEncodeJwt Error")]
+    CannotEncodeJwt(#[from] jsonwebtoken::errors::Error),
+    #[error("Database Error: {0}")]
+    Database(#[from] database::Error),
+    #[error("Profile Error: {0}")]
+    Profile(#[from] profile::Error),
     #[error("Hyper Error: {0}")]
-    Hyper(hyper::Error),
+    Hyper(#[from] hyper::Error),
     #[error("Steam Error: {0}")]
     Steam(#[from] steam::Error),
 }
@@ -36,47 +38,12 @@ impl IntoResponse for Error {
             Error::Unauthorized => StatusCode::UNAUTHORIZED,
             Error::Forbidden => StatusCode::FORBIDDEN,
             Error::InvalidExpirationTime => StatusCode::INTERNAL_SERVER_ERROR,
-            Error::CannotEncodeJwt => StatusCode::INTERNAL_SERVER_ERROR,
-            Error::Database => StatusCode::INTERNAL_SERVER_ERROR,
+            Error::CannotEncodeJwt(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Error::Database(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Error::Profile(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::Hyper(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::Steam(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
         .into_response()
-    }
-}
-
-impl From<account_manager::Error> for Error {
-    fn from(error: account_manager::Error) -> Self {
-        match error {
-            account_manager::Error::Database => Error::Database,
-        }
-    }
-}
-
-impl From<core_profile_manager::Error> for Error {
-    fn from(error: core_profile_manager::Error) -> Self {
-        match error {
-            core_profile_manager::Error::Database => Error::Database,
-        }
-    }
-}
-
-impl From<cotonou_common::generic_dal::Error> for Error {
-    fn from(error: cotonou_common::generic_dal::Error) -> Self {
-        match error {
-            cotonou_common::generic_dal::Error::Database => Error::Database,
-        }
-    }
-}
-
-impl From<jsonwebtoken::errors::Error> for Error {
-    fn from(_error: jsonwebtoken::errors::Error) -> Self {
-        Error::CannotEncodeJwt
-    }
-}
-
-impl From<hyper::Error> for Error {
-    fn from(e: hyper::Error) -> Self {
-        Error::Hyper(e)
     }
 }

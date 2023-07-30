@@ -1,14 +1,9 @@
-use std::{collections::HashSet, time::Duration};
-
-use crate::{error::Error, item_cache::ItemCache, queue_map::QueueMap};
+use crate::{Error, ItemCache, QueueMap};
 use cotonou_common::{
-    game_server_dal::GameServerDAL,
-    matchmaking::{
-        game_server::{GameServer, GameServerId},
-        matchmaking_session::SessionId,
-    },
+    matchmaking::{GameServer, GameServerDAL, GameServerId, SessionId},
     unix_now,
 };
+use std::{collections::HashSet, time::Duration};
 
 pub type ServerQueueMap = QueueMap<GameServerId>;
 pub type ServerCache = ItemCache<GameServerId, GameServer, GameServerDAL>;

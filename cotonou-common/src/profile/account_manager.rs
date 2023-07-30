@@ -1,29 +1,11 @@
 use crate::{
-    account_entity::AccountEntity,
-    generic_dal::{self, GenericDAL},
-    id_generator_dal::{self, IdGeneratorDAL},
-    profile_entity,
+    database::{GenericDAL, IdGeneratorDAL},
+    profile::{profile_entity, AccountEntity, Error},
 };
 use mongodb::bson::DateTime;
 use std::result;
 
 pub type Result<T> = result::Result<T, Error>;
-
-pub enum Error {
-    Database,
-}
-
-impl From<generic_dal::Error> for Error {
-    fn from(_: generic_dal::Error) -> Self {
-        Error::Database
-    }
-}
-
-impl From<id_generator_dal::Error> for Error {
-    fn from(_: id_generator_dal::Error) -> Self {
-        Error::Database
-    }
-}
 
 #[derive(Clone)]
 pub struct AccountManager {
@@ -49,8 +31,7 @@ impl AccountManager {
             .id_generator_dal
             .next_id(profile_entity::TABLE_NAME, 1)
             .await?
-            .try_into()
-            .or(Err(Error::Database))?;
+            .try_into()?;
 
         let mut account_entity = AccountEntity {
             platform_id: plaform_id.to_string(),

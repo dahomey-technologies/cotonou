@@ -1,27 +1,11 @@
 use crate::{
-    matchmaking::game_server::{GameServer, GameServerId}, redis::redis_connection_manager::RedisConnectionManager,
+    matchmaking::{Error, GameServer, GameServerId},
+    redis::RedisConnectionManager,
 };
 use rustis::{
     client::Client,
     commands::{GenericCommands, SetCommands, StringCommands},
 };
-
-pub enum Error {
-    Redis(rustis::Error),
-    Json(serde_json::Error),
-}
-
-impl From<rustis::Error> for Error {
-    fn from(error: rustis::Error) -> Self {
-        Error::Redis(error)
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(error: serde_json::Error) -> Self {
-        Error::Json(error)
-    }
-}
 
 #[derive(Clone)]
 pub struct GameServerDAL {
@@ -218,7 +202,7 @@ impl GameServerDAL {
         if deleted != num_servers {
             log::error!("Cannot delete game servers");
         }
-        
+
         Ok(())
     }
 }

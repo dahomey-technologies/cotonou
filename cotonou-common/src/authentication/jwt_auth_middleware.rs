@@ -1,5 +1,10 @@
-use crate::{get_authorization, jwt_claims::JwtClaims, user::User};
-use axum::{extract::State, http::{Request, StatusCode}, middleware::Next, response::Response};
+use crate::authentication::{get_authorization, JwtClaims, User};
+use axum::{
+    extract::State,
+    http::{Request, StatusCode},
+    middleware::Next,
+    response::Response,
+};
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 
 #[derive(Clone)]
@@ -16,7 +21,7 @@ pub async fn jwt_auth_middleware<B>(
     mut request: Request<B>,
     next: Next<B>,
 ) -> Result<Response, StatusCode> {
-    match get_authorization(request.headers()) {        
+    match get_authorization(request.headers()) {
         Some((scheme, credentials)) => {
             if !scheme.eq_ignore_ascii_case("Bearer") {
                 return Err(StatusCode::UNAUTHORIZED);

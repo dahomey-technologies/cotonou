@@ -6,12 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["authentication"]
-authentication = ["dep:axum", "dep:jsonwebtoken", "dep:mongodb"]
-dal = ["dep:mongodb"]
-matchmaking = ["redis"]
+default = ["authentication", "matchmaking"]
+authentication = ["database", "profile", "dep:axum", "dep:jsonwebtoken"]
+database = ["dep:mongodb"]
+matchmaking = ["redis", "notifications"]
 notifications = ["redis"]
-profile = ["dal"]
+profile = ["database"]
 redis = ["dep:rustis"]
 
 [dependencies]

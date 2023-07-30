@@ -1,17 +1,19 @@
-use std::{collections::HashMap, thread::{JoinHandle, self}, sync::mpsc::{self, TryRecvError}};
-
 use crate::{
     match_functions::{is_in_bounds, MatchFunctions},
     matchmaker::{Matchmaker, MatchmakerContext},
-    queue_map::QueueMap,
-    util::get_average_mmr,
+    QueueMap,
+    get_average_mmr,
 };
 use cotonou_common::{
     matchmaking::{
-        matchmaking_session::{MatchmakingSession, SessionId},
-        matchmaking_ticket::{MatchmakingPlayer, MatchmakingTicket},
+        GameModeConfig, MatchmakingPlayer, MatchmakingSession, MatchmakingTicket, SessionId,
     },
-    models::{GameModeConfig, ProfileId},
+    profile::ProfileId,
+};
+use std::{
+    collections::HashMap,
+    sync::mpsc::{self, TryRecvError},
+    thread::{self, JoinHandle},
 };
 
 /// Based Multi-Threaded CutLists algorithm described here:
@@ -55,7 +57,7 @@ impl MultiThreadedCutListsMatchmaker {
             msg_from_job_sender,
             msg_to_job_receiver,
         );
-        self.jobs.push(thread::spawn(move || { job.job_loop() }));
+        self.jobs.push(thread::spawn(move || job.job_loop()));
         self.msg_senders.push(msg_to_job_sender);
         self.msg_receivers.push(msg_from_job_receiver);
     }
@@ -73,7 +75,7 @@ impl Drop for MultiThreadedCutListsMatchmaker {
         while let Some(job) = self.jobs.pop() {
             if let Err(e) = job.join() {
                 log::error!("Cannot shutdown job in MTCutListsMatchmaker: {e:?}");
-                continue;  
+                continue;
             }
         }
 
@@ -224,7 +226,7 @@ impl Job {
         }
     }
 
-    pub fn job_loop(&mut self){
+    pub fn job_loop(&mut self) {
         loop {
             while let Some(message) = match self.msg_receiver.try_recv() {
                 Ok(message) => Some(message),

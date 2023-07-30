@@ -1,4 +1,4 @@
-use cotonou_common::{matchmaking::matchmaking_ticket::MatchmakingPlayer, unix_now};
+use cotonou_common::{matchmaking::MatchmakingPlayer, unix_now};
 
 pub fn get_average_mmr(players: &[MatchmakingPlayer]) -> u32 {
     let sum = players.iter().fold(0, |acc, p| acc + p.mmr);

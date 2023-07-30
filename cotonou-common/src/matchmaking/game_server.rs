@@ -1,5 +1,5 @@
 use super::matchmaking_session::SessionId;
-use crate::models::UniqueId;
+use crate::UniqueId;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -107,7 +107,7 @@ impl rustis::resp::PrimitiveResponse for GameServerId {}
 #[cfg(test)]
 mod tests {
     use super::GameServerId;
-    use crate::models::UniqueId;
+    use crate::UniqueId;
 
     const TEST_UUID: &str = "1f6cf4f5d977453394c6ba33b7a3e299";
 

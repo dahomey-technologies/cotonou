@@ -1,8 +1,8 @@
-use crate::error::Error;
+use crate::Error;
 use cotonou_common::{
-    matchmaking::game_server::GameServerId,
-    notifications::{notification::Notification, notification_manager::NotificationManager},
-    models::ProfileId,
+    matchmaking::GameServerId,
+    notifications::{Notification, NotificationManager},
+    profile::ProfileId,
 };
 use std::collections::VecDeque;
 

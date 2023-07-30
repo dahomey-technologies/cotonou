@@ -1,5 +1,5 @@
 use super::matchmaking_session::SessionId;
-use crate::models::ProfileId;
+use crate::profile::ProfileId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq)]

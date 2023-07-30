@@ -1,7 +1,4 @@
-use super::{
-    matchmaking_session::SessionId,
-};
-use crate::notifications::notification::Notification;
+use crate::{matchmaking::SessionId, notifications::Notification};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]

@@ -1,29 +1,11 @@
+use crate::{
+    matchmaking::{redis_key_names, Error, MatchmakingCommand},
+    redis::RedisConnectionManager,
+};
 use rustis::{client::Client, commands::ListCommands};
-
-use super::{matchmaking_command::MatchmakingCommand, redis_key_names};
-use crate::redis::redis_connection_manager::RedisConnectionManager;
 use std::result;
 
 pub type Result<T> = result::Result<T, Error>;
-
-#[derive(Debug)]
-pub enum Error {
-    Json,
-    Redis,
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(json_error: serde_json::Error) -> Self {
-        println!("Json Error: {:?}", json_error);
-        Error::Json
-    }
-}
-
-impl From<rustis::Error> for Error {
-    fn from(_: rustis::Error) -> Self {
-        Error::Redis
-    }
-}
 
 #[derive(Clone)]
 pub struct MatchmakingCommandDAL {

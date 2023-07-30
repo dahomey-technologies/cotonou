@@ -1,14 +1,10 @@
-use crate::{
-    app_state::AppState,
-    authentication_service::{authenticate, keep_alive},
-    health_check_service::health_check,
-};
+use crate::{app_state::*, authentication_service::*, health_check_service::*};
 use axum::{
     middleware,
     routing::{get, put},
     Router,
 };
-use cotonou_common::jwt_auth_middleware::{jwt_auth_middleware, JwtSecret};
+use cotonou_common::authentication::{jwt_auth_middleware, JwtSecret};
 use error::Error;
 use std::net::SocketAddr;
 

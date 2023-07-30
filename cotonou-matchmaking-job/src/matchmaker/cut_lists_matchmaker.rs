@@ -1,15 +1,12 @@
 use crate::{
+    get_average_mmr,
     match_functions::{is_in_bounds, MatchFunctions},
     matchmaker::{Matchmaker, MatchmakerContext},
-    queue_map::QueueMap,
-    util::get_average_mmr,
+    QueueMap,
 };
 use cotonou_common::{
-    matchmaking::{
-        matchmaking_session::{MatchmakingSession, SessionId},
-        matchmaking_ticket::MatchmakingTicket,
-    },
-    models::{GameModeConfig, ProfileId},
+    matchmaking::{GameModeConfig, MatchmakingSession, MatchmakingTicket, SessionId},
+    profile::ProfileId,
 };
 use std::iter::repeat;
 

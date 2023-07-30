@@ -1,4 +1,7 @@
-use crate::{generic_dal::{GenericDAL, self}, mongo_db_collection::MongoDbCollection};
+use crate::{
+    database::{Error, GenericDAL},
+    mongo_db::MongoDbCollection,
+};
 use serde::{Deserialize, Serialize};
 
 const TABLE_NAME: &str = "IdGenerator";
@@ -22,16 +25,6 @@ impl MongoDbCollection for IdGenerator {
 #[derive(Clone)]
 pub struct IdGeneratorDAL {
     pub generic_dal: GenericDAL,
-}
-
-pub enum Error {
-    Database,
-}
-
-impl From<generic_dal::Error> for Error {
-    fn from(_: generic_dal::Error) -> Self {
-        Error::Database
-    }
 }
 
 impl IdGeneratorDAL {

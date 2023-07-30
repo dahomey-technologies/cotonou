@@ -1,27 +1,10 @@
 use crate::{
-    core_profile_entity::CoreProfileEntity,
-    dal::generic_dal::GenericDAL,
-    generic_dal,
-    master_entity::{
-        CREATION_DATE_PROPERTY, DATA_VERSION_PROPERTY, ENTITY_VERSION_PROPERTY, KEY,
-        LAST_MODIFICATION_DATE_PROPERTY,
-    },
-    models::ProfileId,
-    profile_entity,
+    database::{master_entity, GenericDAL},
+    profile::{profile_entity, CoreProfileEntity, Error, ProfileId},
 };
 use std::result;
 
 pub type Result<T> = result::Result<T, Error>;
-
-pub enum Error {
-    Database,
-}
-
-impl From<generic_dal::Error> for Error {
-    fn from(_: generic_dal::Error) -> Self {
-        Error::Database
-    }
-}
 
 #[derive(Clone)]
 pub struct CoreProfileManager {
@@ -35,10 +18,7 @@ impl CoreProfileManager {
 
     pub async fn create_core_profile(&self, core_profile: &mut CoreProfileEntity) -> Result<bool> {
         core_profile.entity_version = 1;
-        self.generic_dal
-            .save_master_entity(core_profile)
-            .await
-            .or(Err(Error::Database))
+        Ok(self.generic_dal.save_master_entity(core_profile).await?)
     }
 
     pub async fn get_core_profile(
@@ -46,11 +26,11 @@ impl CoreProfileManager {
         profile_id: ProfileId,
     ) -> Result<Option<CoreProfileEntity>> {
         let attributes_to_get = [
-            KEY,
-            DATA_VERSION_PROPERTY,
-            ENTITY_VERSION_PROPERTY,
-            CREATION_DATE_PROPERTY,
-            LAST_MODIFICATION_DATE_PROPERTY,
+            master_entity::KEY,
+            master_entity::DATA_VERSION_PROPERTY,
+            master_entity::ENTITY_VERSION_PROPERTY,
+            master_entity::CREATION_DATE_PROPERTY,
+            master_entity::LAST_MODIFICATION_DATE_PROPERTY,
             profile_entity::DISPLAY_NAME_PROPERTY,
             profile_entity::PLATFORM_ID_PROPERTY,
         ];
@@ -62,7 +42,11 @@ impl CoreProfileManager {
         Ok(core_profile)
     }
 
-    pub async fn update_display_name(&self, profile_id: ProfileId, display_name: &str) -> Result<()> {
+    pub async fn update_display_name(
+        &self,
+        profile_id: ProfileId,
+        display_name: &str,
+    ) -> Result<()> {
         self.generic_dal
             .update_property::<CoreProfileEntity, _, _>(
                 profile_id,

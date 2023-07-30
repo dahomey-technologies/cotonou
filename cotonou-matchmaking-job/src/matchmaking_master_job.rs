@@ -1,17 +1,12 @@
-use crate::{
-    error::Error, matchmaking_assembler::MatchmakingAssembler,
-    matchmaking_job::MatchmakingJob
-};
+use crate::{Error, MatchmakingAssembler, MatchmakingJob};
 use common_macros::hash_map;
 use cotonou_common::{
-    game_server_dal::GameServerDAL,
-    matchmaking::matchmaking_command_dal::MatchmakingCommandDAL,
-    matchmaking_average_waiting_time_dal::MatchmakingWaitingTimeDAL,
-    matchmaking_session_dal::MatchmakingSessionDAL,
-    matchmaking_settings_dal::MatchmakingSettingsDAL,
-    matchmaking_ticket_dal::MatchmakingTicketDAL,
-    notifications::notification_manager::NotificationManager,
-    redis::{redis_config::RedisConfig, redis_connection_manager::RedisConnectionManager},
+    matchmaking::{
+        GameServerDAL, MatchmakingCommandDAL, MatchmakingSessionDAL, MatchmakingSettingsDAL,
+        MatchmakingTicketDAL, MatchmakingWaitingTimeDAL,
+    },
+    notifications::NotificationManager,
+    redis::{RedisConfig, RedisConnectionManager},
 };
 use tokio::task::JoinSet;
 

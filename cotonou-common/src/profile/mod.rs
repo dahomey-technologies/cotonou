@@ -1,12 +1,17 @@
-#[cfg(feature = "profile")]
-pub mod core_profile_manager;
-#[cfg(feature = "profile")]
-pub mod core_profile_entity;
-#[cfg(feature = "profile")]
-pub mod platform;
-#[cfg(feature = "profile")]
-pub mod account_manager;
-#[cfg(feature = "profile")]
 pub mod account_entity;
-#[cfg(feature = "profile")]
+mod account_manager;
+pub mod core_profile_entity;
+mod core_profile_manager;
+mod error;
+mod platform;
 pub mod profile_entity;
+mod profile_id;
+
+pub use account_entity::AccountEntity;
+pub use account_manager::*;
+pub use core_profile_entity::CoreProfileEntity;
+pub use core_profile_manager::*;
+pub use error::*;
+pub use platform::*;
+pub use profile_entity::ProfileEntity;
+pub use profile_id::*;

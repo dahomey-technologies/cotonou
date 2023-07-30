@@ -1,5 +1,5 @@
-use super::MatchFunctions;
-use cotonou_common::matchmaking::matchmaking_ticket::MatchmakingPlayer;
+use crate::match_functions::MatchFunctions;
+use cotonou_common::matchmaking::MatchmakingPlayer;
 
 /// First come, first served
 #[derive(Clone)]

@@ -1,6 +1,5 @@
-use super::MatchFunctions;
-use crate::util::{get_average_mmr, get_average_waiting_time};
-use cotonou_common::{matchmaking::matchmaking_ticket::MatchmakingPlayer};
+use crate::{get_average_mmr, get_average_waiting_time, match_functions::MatchFunctions};
+use cotonou_common::matchmaking::MatchmakingPlayer;
 
 #[derive(Clone)]
 pub struct MmrMatchFunctions {

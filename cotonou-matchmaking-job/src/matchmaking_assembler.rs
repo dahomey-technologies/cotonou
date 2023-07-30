@@ -1,4 +1,7 @@
-use cotonou_common::{matchmaking::matchmaking_ticket::{MatchmakingPlayer, MatchmakingPlayerStatus}, unix_now};
+use cotonou_common::{
+    matchmaking::{MatchmakingPlayer, MatchmakingPlayerStatus},
+    unix_now,
+};
 
 #[derive(Clone)]
 pub struct MatchmakingAssembler {}
@@ -8,7 +11,11 @@ impl MatchmakingAssembler {
         Self {}
     }
 
-    pub fn convert_to_matchmaking_player(&self, player: &MatchmakingPlayer, ticket_creation_time: u64) -> MatchmakingPlayer {
+    pub fn convert_to_matchmaking_player(
+        &self,
+        player: &MatchmakingPlayer,
+        ticket_creation_time: u64,
+    ) -> MatchmakingPlayer {
         let now = unix_now();
 
         let mut player = player.clone();

@@ -1,7 +1,6 @@
 use crate::{
-    master_entity::{MasterEntity, DATA_VERSION_PROPERTY},
-    mongo::mongo_config::MongoConfig,
-    mongo_db_collection::MongoDbCollection,
+    database::{MasterEntity, master_entity, Error},
+    mongo_db::{MongoDbConfig, MongoDbCollection}
 };
 use futures::TryStreamExt;
 use mongodb::{
@@ -16,25 +15,13 @@ use std::result;
 
 pub type Result<T> = result::Result<T, Error>;
 
-#[derive(Debug)]
-pub enum Error {
-    Database,
-}
-
-impl From<mongodb::error::Error> for Error {
-    fn from(e: mongodb::error::Error) -> Self {
-        println!("mongoDb error: {e}");
-        Error::Database
-    }
-}
-
 #[derive(Clone)]
 pub struct GenericDAL {
     mongodb_database: mongodb::Database,
 }
 
 impl GenericDAL {
-    pub async fn initialize(mongo_config: &MongoConfig) -> Result<GenericDAL> {
+    pub async fn initialize(mongo_config: &MongoDbConfig) -> Result<GenericDAL> {
         let mongo_options =
             mongodb::options::ClientOptions::parse(&mongo_config.connection_string).await?;
         let database_name = mongo_options
@@ -124,7 +111,7 @@ impl GenericDAL {
         let mut query = bson::Document::new();
         query.insert("_id", entity.get_id());
         if let Some(data_version) = entity.get_data_version() {
-            query.insert(DATA_VERSION_PROPERTY, data_version);
+            query.insert(master_entity::DATA_VERSION_PROPERTY, data_version);
         }
 
         entity.set_data_version(Some(entity.get_data_version().unwrap_or(0) + 1));

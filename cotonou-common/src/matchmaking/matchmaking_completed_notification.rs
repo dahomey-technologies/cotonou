@@ -1,9 +1,5 @@
-use crate::{
-    notifications::notification::Notification,
-};
+use crate::{notifications::Notification, matchmaking::SessionId};
 use serde::{Deserialize, Serialize};
-
-use super::matchmaking_session::SessionId;
 
 #[derive(Serialize, Deserialize)]
 pub struct MatchmakingCompletedNotification {

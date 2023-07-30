@@ -1,4 +1,4 @@
-use super::redis_config::RedisConfig;
+use crate::redis::{Error, RedisConfig};
 use std::{collections::HashMap, result};
 
 pub struct RedisConnectionManager {
@@ -6,25 +6,6 @@ pub struct RedisConnectionManager {
 }
 
 pub type Result<T> = result::Result<T, Error>;
-
-#[derive(Debug)]
-pub enum Error {
-    BadUriFormat(url::ParseError),
-    ConnectionError(rustis::Error),
-}
-
-impl From<url::ParseError> for Error {
-    fn from(e: url::ParseError) -> Self {
-        Error::BadUriFormat(e)
-    }
-}
-
-impl From<rustis::Error> for Error {
-    fn from(e: rustis::Error) -> Self {
-        println!("redis error: {}", e);
-        Error::ConnectionError(e)
-    }
-}
 
 impl RedisConnectionManager {
     pub async fn initialize(redis_config: RedisConfig) -> Result<Self> {
@@ -44,7 +25,9 @@ impl RedisConnectionManager {
             clients_by_name.insert(name.clone(), client);
         }
 
-        Ok(Self { clients: clients_by_name })
+        Ok(Self {
+            clients: clients_by_name,
+        })
     }
 
     pub fn get_client(&self, name: &str) -> Option<rustis::client::Client> {

@@ -1,14 +1,11 @@
 use crate::{
     match_functions::{is_in_bounds, MatchFunctions},
     matchmaker::{Matchmaker, MatchmakerContext},
-    queue_map::QueueMap,
+    QueueMap,
 };
 use cotonou_common::{
-    matchmaking::{
-        matchmaking_session::{MatchmakingSession, SessionId},
-        matchmaking_ticket::MatchmakingTicket,
-    },
-    models::{GameModeConfig, ProfileId},
+    matchmaking::{GameModeConfig, MatchmakingSession, MatchmakingTicket, SessionId},
+    profile::ProfileId,
 };
 
 pub struct SimpleListMatchmaker {
@@ -79,11 +76,10 @@ impl SimpleListMatchmaker {
                 };
 
                 if self.match_functions.is_match(
-                        &self.game_mode_config,
-                        &ticket1.players,
-                        &ticket2.players,
-                    )
-                {
+                    &self.game_mode_config,
+                    &ticket1.players,
+                    &ticket2.players,
+                ) {
                     let session_id = SessionId::new();
                     context.match_tickets_to_new_session(session_id, &[*ticket1_id, *ticket2_id]);
 

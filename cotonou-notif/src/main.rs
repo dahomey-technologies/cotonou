@@ -1,12 +1,11 @@
-use crate::notification_service::{clear_notifications, get_notifications, test_publish};
+use crate::{error::*, notification_service::*};
 use axum::{middleware, routing::get, Router};
 use common_macros::hash_map;
 use cotonou_common::{
-    jwt_auth_middleware::{jwt_auth_middleware, JwtSecret},
-    notifications::notification_manager::NotificationManager,
-    redis::{redis_config::RedisConfig, redis_connection_manager::RedisConnectionManager},
+    authentication::{jwt_auth_middleware, JwtSecret},
+    notifications::NotificationManager,
+    redis::{RedisConfig, RedisConnectionManager},
 };
-use error::Error;
 use std::{net::SocketAddr, sync::Arc};
 
 mod error;

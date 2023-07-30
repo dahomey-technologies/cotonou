@@ -1,12 +1,7 @@
-use crate::{
-    matchmaking_service::CreateMatchmakingTicketRequest,
-    profile_for_matchmaking_entity::ProfileForMatchmakingEntity,
-};
+use crate::{CreateMatchmakingTicketRequest, ProfileForMatchmakingEntity};
 use cotonou_common::{
-    matchmaking::matchmaking_ticket::{
-        MatchmakingPlayer, MatchmakingPlayerStatus, MatchmakingTicket,
-    },
-    models::ProfileId,
+    matchmaking::{MatchmakingPlayer, MatchmakingPlayerStatus, MatchmakingTicket},
+    profile::ProfileId,
     unix_now,
 };
 

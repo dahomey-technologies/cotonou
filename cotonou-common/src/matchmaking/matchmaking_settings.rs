@@ -1,5 +1,5 @@
 #[cfg(feature = "matchmaking")]
-use crate::models::GameRegion;
+use crate::matchmaking::GameRegion;
 
 #[cfg(feature = "matchmaking")]
 #[derive(Debug, Clone)]
@@ -27,7 +27,7 @@ pub enum MatchFunctionsConfig {
     FirstComeFirstServed,
     Mmr {
         max_mmr_distance: u32,
-        waiting_time_weight: u32
+        waiting_time_weight: u32,
     },
 }
 

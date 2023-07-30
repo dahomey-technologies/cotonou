@@ -1,17 +1,11 @@
-use crate::error::Error;
+use crate::Error;
 use axum::{extract::State, http::HeaderMap, Extension, Json};
 use cotonou_common::{
-    account_entity::AccountEntity,
-    account_manager::AccountManager,
-    core_profile_entity::CoreProfileEntity,
-    core_profile_manager::CoreProfileManager,
-    get_authorization,
-    jwt_claims::{JwtClaims, JwtRole},
-    matchmaking::game_server::GameServerId,
-    models::HostingEnvironment,
+    authentication::{get_authorization, JwtClaims, JwtRole, User},
+    matchmaking::GameServerId,
+    profile::{AccountEntity, AccountManager, CoreProfileEntity, CoreProfileManager},
     steam::{self, SteamId, SteamMicroTxnClient, SteamUserAuthClient, SteamUserClient},
     unix_now,
-    user::User,
 };
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::Serialize;
@@ -30,10 +24,10 @@ pub struct AuthenticationInfo {
     pub auth_token: String,
 }
 
-pub type Result<T> = result::Result<T, Error>;
+type Result<T> = result::Result<T, Error>;
 
 pub async fn authenticate(
-    State(hosting_environment): State<HostingEnvironment>,
+    State(is_development): State<bool>,
     State(account_manager): State<Arc<AccountManager>>,
     State(core_profile_manager): State<Arc<CoreProfileManager>>,
     State(steam_user_auth_client): State<Arc<SteamUserAuthClient>>,
@@ -50,7 +44,7 @@ pub async fn authenticate(
 
     match scheme {
         "nul" => {
-            if hosting_environment != HostingEnvironment::Dev {
+            if !is_development {
                 return Err(Error::Unauthorized);
             }
 
@@ -87,12 +81,7 @@ pub async fn authenticate(
             let display_name = &steam_player_summary.persona_name;
 
             let user_info = steam_micro_tnx_client
-                .get_user_info(
-                    hosting_environment == HostingEnvironment::Dev,
-                    STEAM_WEB_API_KEY,
-                    STEAM_APP_ID,
-                    steam_id,
-                )
+                .get_user_info(is_development, STEAM_WEB_API_KEY, STEAM_APP_ID, steam_id)
                 .await?;
             country_code = user_info.country;
             currency = user_info.currency;
@@ -108,7 +97,7 @@ pub async fn authenticate(
             role = JwtRole::Player;
         }
         "srv" => {
-            let server_id = authenticate_server(hosting_environment, credentials)?;
+            let server_id = authenticate_server(is_development, credentials)?;
 
             subject = server_id.to_string();
             role = JwtRole::Server;
@@ -190,10 +179,7 @@ async fn authenticate_steam(
     ))
 }
 
-fn authenticate_server(
-    hosting_environment: HostingEnvironment,
-    credentials: &str,
-) -> Result<GameServerId> {
+fn authenticate_server(is_development: bool, credentials: &str) -> Result<GameServerId> {
     match decode::<JwtClaims>(
         credentials,
         &DecodingKey::from_secret("server_secret".as_ref()),
@@ -219,7 +205,7 @@ fn authenticate_server(
             Ok(server_id)
         }
         Err(e) => {
-            if hosting_environment == HostingEnvironment::Dev {
+            if is_development {
                 let server_id =
                     GameServerId::try_parse(credentials).ok_or_else(|| Error::Unauthorized)?;
                 Ok(server_id)

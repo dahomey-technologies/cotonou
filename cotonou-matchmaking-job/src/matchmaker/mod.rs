@@ -4,9 +4,8 @@ mod mt_cut_lists_matchmaker;
 mod simple_list_matchmaker;
 
 use crate::match_functions::{FcFsMatchFunctions, MatchFunctions, MmrMatchFunctions};
-use cotonou_common::{
-    matchmaking::{matchmaking_session::MatchmakingSession, matchmaking_ticket::MatchmakingTicket},
-    models::{GameModeConfig, MatchFunctionsConfig, MatchmakerConfig},
+use cotonou_common::matchmaking::{
+    GameModeConfig, MatchFunctionsConfig, MatchmakerConfig, MatchmakingSession, MatchmakingTicket,
 };
 use cut_lists_matchmaker::*;
 pub use matchmaker_context::*;
@@ -29,14 +28,16 @@ pub fn new_matchmaker(
             region_system_name,
             game_mode_config,
             match_functions,
-            mmr_range
+            mmr_range,
         )),
-        MatchmakerConfig::MultiThreadedCutLists { mmr_range } => Box::new(MultiThreadedCutListsMatchmaker::new(
-            region_system_name,
-            game_mode_config,
-            match_functions,
-            mmr_range
-        )),
+        MatchmakerConfig::MultiThreadedCutLists { mmr_range } => {
+            Box::new(MultiThreadedCutListsMatchmaker::new(
+                region_system_name,
+                game_mode_config,
+                match_functions,
+                mmr_range,
+            ))
+        }
     }
 }
 

@@ -1,26 +1,22 @@
 #[cfg(debug_assertions)]
 use crate::app_state::AppState;
 use crate::{
-    error::Error, matchmaking_assembler::MatchmakingAssembler,
-    matchmaking_started_notification::MatchmakingStartedNotification,
-    profile_for_matchmaking_manager::ProfileForMatchmakingManager,
+    Error, MatchmakingAssembler,
+    MatchmakingStartedNotification,
+    ProfileForMatchmakingManager,
 };
 use axum::{
     extract::{Path, Query, State},
     Extension, Json,
 };
 use cotonou_common::{
-    jwt_claims::JwtRole,
+    authentication::{JwtRole, User},
     matchmaking::{
-        matchmaking_command::MatchmakingCommand, matchmaking_command_dal::MatchmakingCommandDAL,
-        matchmaking_session::SessionId, matchmaking_ticket::MatchmakingPlayerStatus,
+        MatchmakingCommand, MatchmakingCommandDAL, MatchmakingPlayerStatus, MatchmakingSessionDAL,
+        MatchmakingSettingsDAL, MatchmakingTicketDAL, MatchmakingWaitingTimeDAL, SessionId,
     },
-    matchmaking_session_dal::MatchmakingSessionDAL,
-    matchmaking_settings_dal::MatchmakingSettingsDAL,
-    matchmaking_ticket_dal::MatchmakingTicketDAL,
-    models::ProfileId,
-    notifications::notification_manager::NotificationManager,
-    user::User, matchmaking_average_waiting_time_dal::MatchmakingWaitingTimeDAL,
+    notifications::NotificationManager,
+    profile::ProfileId,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -123,7 +119,9 @@ pub async fn create_matchmaking_ticket(
 
     // estimated wait time when no friend party
     if ticket.players.len() == 1 {
-        estimated_wait_time = matchmaking_waiting_time_dal.get_average_waiting_time(&region_system_name, &game_mode).await?;
+        estimated_wait_time = matchmaking_waiting_time_dal
+            .get_average_waiting_time(&region_system_name, &game_mode)
+            .await?;
     }
 
     matchmaking_command_dal

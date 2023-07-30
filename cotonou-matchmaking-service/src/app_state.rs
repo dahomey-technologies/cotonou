@@ -1,16 +1,15 @@
-use crate::{
-    error::Error, matchmaking_assembler::MatchmakingAssembler,
-    profile_for_matchmaking_manager::ProfileForMatchmakingManager,
-};
+use crate::{Error, MatchmakingAssembler, ProfileForMatchmakingManager};
 use axum::extract::FromRef;
 use common_macros::hash_map;
 use cotonou_common::{
-    generic_dal::GenericDAL,
-    matchmaking::matchmaking_command_dal::MatchmakingCommandDAL,
-    matchmaking_settings_dal::MatchmakingSettingsDAL,
-    mongo::mongo_config::MongoConfig,
-    notifications::notification_manager::NotificationManager,
-    redis::{redis_config::RedisConfig, redis_connection_manager::RedisConnectionManager}, game_server_dal::GameServerDAL, matchmaking_ticket_dal::MatchmakingTicketDAL, matchmaking_session_dal::MatchmakingSessionDAL, matchmaking_average_waiting_time_dal::MatchmakingWaitingTimeDAL,
+    database::GenericDAL,
+    matchmaking::{
+        GameServerDAL, MatchmakingCommandDAL, MatchmakingSessionDAL, MatchmakingSettingsDAL,
+        MatchmakingTicketDAL, MatchmakingWaitingTimeDAL,
+    },
+    mongo_db::MongoDbConfig,
+    notifications::NotificationManager,
+    redis::{RedisConfig, RedisConnectionManager},
 };
 use std::sync::Arc;
 
@@ -32,7 +31,7 @@ impl AppState {
         let mongo_host = "mongo";
         let redis_host = "redis";
 
-        let generic_dal = GenericDAL::initialize(&MongoConfig {
+        let generic_dal = GenericDAL::initialize(&MongoDbConfig {
             connection_string: format!("mongodb://{mongo_host}:27017/test"),
         })
         .await?;
@@ -56,8 +55,10 @@ impl AppState {
         let matchmaking_settings_dal = Arc::new(MatchmakingSettingsDAL::new());
         let game_server_dal = Arc::new(GameServerDAL::new(&redis_connection_manager));
         let matchmaking_ticket_dal = Arc::new(MatchmakingTicketDAL::new(&redis_connection_manager));
-        let matchmaking_session_dal = Arc::new(MatchmakingSessionDAL::new(&redis_connection_manager));
-        let matchmaking_waiting_time_dal = Arc::new(MatchmakingWaitingTimeDAL::new(&redis_connection_manager));
+        let matchmaking_session_dal =
+            Arc::new(MatchmakingSessionDAL::new(&redis_connection_manager));
+        let matchmaking_waiting_time_dal =
+            Arc::new(MatchmakingWaitingTimeDAL::new(&redis_connection_manager));
 
         Ok(Self {
             profile_for_matchmaking_manager,
@@ -68,7 +69,7 @@ impl AppState {
             game_server_dal,
             matchmaking_ticket_dal,
             matchmaking_session_dal,
-            matchmaking_waiting_time_dal
+            matchmaking_waiting_time_dal,
         })
     }
 }
