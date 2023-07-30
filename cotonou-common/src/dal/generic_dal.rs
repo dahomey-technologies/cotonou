@@ -3,16 +3,16 @@ use crate::{
     mongo::mongo_config::MongoConfig,
     mongo_db_collection::MongoDbCollection,
 };
+use futures::TryStreamExt;
 use mongodb::{
     bson::{self, Bson, DateTime},
     options::{
-        FindOneAndUpdateOptions, FindOneOptions, ReplaceOptions, ReturnDocument,
-        UpdateModifications, FindOptions,
+        FindOneAndUpdateOptions, FindOneOptions, FindOptions, ReplaceOptions, ReturnDocument,
+        UpdateModifications,
     },
 };
 use serde::{de::DeserializeOwned, Serialize};
 use std::result;
-use futures::{TryStreamExt};
 
 pub type Result<T> = result::Result<T, Error>;
 
@@ -35,12 +35,18 @@ pub struct GenericDAL {
 
 impl GenericDAL {
     pub async fn initialize(mongo_config: &MongoConfig) -> Result<GenericDAL> {
-        let mongo_options = mongodb::options::ClientOptions::parse(&mongo_config.connection_string).await?;
-        let database_name = mongo_options.default_database.clone().ok_or(Error::Database)?;
+        let mongo_options =
+            mongodb::options::ClientOptions::parse(&mongo_config.connection_string).await?;
+        let database_name = mongo_options
+            .default_database
+            .clone()
+            .ok_or(Error::Database)?;
         let mongo_client = mongodb::Client::with_options(mongo_options)?;
         let mongo_database = mongo_client.database(&database_name);
 
-        Ok(Self { mongodb_database: mongo_database })
+        Ok(Self {
+            mongodb_database: mongo_database,
+        })
     }
 
     pub async fn get_partial_entity<T, TI>(
@@ -72,15 +78,25 @@ impl GenericDAL {
     {
         let mongo_collection = self.get_collection::<T>();
 
-        let ids = entity_ids.iter().map(|i| Bson::from(i.clone())).collect::<Vec<Bson>>();
+        let ids = entity_ids
+            .iter()
+            .map(|i| Bson::from(i.clone()))
+            .collect::<Vec<Bson>>();
         let mut filter = bson::doc! { "_id": {  } };
-        filter.get_document_mut("_id").or(Err(Error::Database))?.insert("$in", ids);
+        filter
+            .get_document_mut("_id")
+            .or(Err(Error::Database))?
+            .insert("$in", ids);
 
         let options = FindOptions::builder()
             .projection(Self::get_projection(attributes_to_get))
             .build();
 
-        Ok(mongo_collection.find(filter, options).await?.try_collect().await?)
+        Ok(mongo_collection
+            .find(filter, options)
+            .await?
+            .try_collect()
+            .await?)
     }
 
     pub async fn get_entity<T, TI>(&self, entity_id: TI) -> Result<Option<T>>

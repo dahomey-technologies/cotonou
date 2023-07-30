@@ -1,6 +1,6 @@
-use std::sync::Arc;
-
-use crate::{app_state::AppState, error::Error};
+#[cfg(debug_assertions)]
+use crate::app_state::AppState;
+use crate::error::Error;
 use axum::{
     extract::{Path, State},
     Extension, Json,
@@ -16,6 +16,7 @@ use cotonou_common::{
     user::User,
 };
 use serde::Deserialize;
+use std::sync::Arc;
 
 #[derive(Debug, Deserialize)]
 pub struct InitializeGameServerRequest {

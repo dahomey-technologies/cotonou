@@ -7,6 +7,8 @@ edition = "2021"
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1.26", features = ["rt-multi-thread"] }
 hyper = { version = "0.14" }
+hyper-tls = { version = "0.5" }
 axum = { version = "0.6", features = ["macros"] }
 jsonwebtoken = { version = "8" }
+thiserror = "1.0"
 cotonou-common = { path = "../cotonou-common", features = ["authentication", "profile"] }

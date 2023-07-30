@@ -1,5 +1,7 @@
+#[cfg(debug_assertions)]
+use crate::app_state::AppState;
 use crate::{
-    app_state::AppState, error::Error, matchmaking_assembler::MatchmakingAssembler,
+    error::Error, matchmaking_assembler::MatchmakingAssembler,
     matchmaking_started_notification::MatchmakingStartedNotification,
     profile_for_matchmaking_manager::ProfileForMatchmakingManager,
 };

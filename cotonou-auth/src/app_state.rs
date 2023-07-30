@@ -1,18 +1,25 @@
+use crate::error::Error;
 use axum::extract::FromRef;
 use cotonou_common::{
-    account_manager::AccountManager, core_profile_manager::CoreProfileManager,
-    generic_dal::GenericDAL, id_generator_dal::IdGeneratorDAL, models::HostingEnvironment,
+    account_manager::AccountManager,
+    core_profile_manager::CoreProfileManager,
+    generic_dal::GenericDAL,
+    id_generator_dal::IdGeneratorDAL,
+    models::HostingEnvironment,
     mongo::mongo_config::MongoConfig,
+    steam::{SteamMicroTxnClient, SteamUserAuthClient, SteamUserClient}, http::HttpClient,
 };
+use hyper_tls::HttpsConnector;
 use std::sync::Arc;
-
-use crate::error::Error;
 
 #[derive(Clone, FromRef)]
 pub struct AppState {
     hosting_environment: HostingEnvironment,
     account_manager: Arc<AccountManager>,
     core_profile_manager: Arc<CoreProfileManager>,
+    steam_user_auth_client: Arc<SteamUserAuthClient>,
+    steam_user_client: Arc<SteamUserClient>,
+    steam_micro_tnx_client: Arc<SteamMicroTxnClient>,
 }
 
 impl AppState {
@@ -30,11 +37,20 @@ impl AppState {
             generic_dal: generic_dal.clone(),
         };
         let core_profile_manager = CoreProfileManager { generic_dal };
+        let http_client = HttpClient::new(
+            hyper::client::Client::builder().build::<_, hyper::Body>(HttpsConnector::new()),
+        );
+        let steam_user_auth_client = SteamUserAuthClient::new(http_client.clone());
+        let steam_user_client = SteamUserClient::new(http_client.clone());
+        let steam_micro_tnx_client = SteamMicroTxnClient::new(http_client);
 
         Ok(Self {
             hosting_environment: HostingEnvironment::Dev,
             account_manager: Arc::new(account_manager),
             core_profile_manager: Arc::new(core_profile_manager),
+            steam_user_auth_client: Arc::new(steam_user_auth_client),
+            steam_user_client: Arc::new(steam_user_client),
+            steam_micro_tnx_client: Arc::new(steam_micro_tnx_client),
         })
     }
 }
