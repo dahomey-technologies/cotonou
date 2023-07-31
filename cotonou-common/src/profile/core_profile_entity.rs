@@ -41,11 +41,9 @@ impl CoreProfileEntity {
     pub fn get_platform(&self) -> Platform {
         if self.platform_id.is_empty() {
             Platform::None
-        } else if self.platform_id.starts_with("stm-") {
+        } else if self.platform_id.starts_with("stm-") || self.platform_id.starts_with("nul-") {
             Platform::PC
-        } else if self.platform_id.starts_with("nul-") {
-            Platform::PC
-        }else {
+        } else {
             Platform::None
         }
     }
