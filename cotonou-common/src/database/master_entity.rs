@@ -1,4 +1,4 @@
-use crate::mongo_db::MongoDbCollection;
+use crate::database::MongoDbCollection;
 use mongodb::bson::DateTime;
 
 pub const KEY: &str = "_id";

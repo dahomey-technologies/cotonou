@@ -1,4 +1,4 @@
-use crate::{types::ProfileId, mongo_db::MongoDbCollection};
+use crate::{database::MongoDbCollection, types::ProfileId};
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
 

@@ -1,6 +1,6 @@
 use crate::{
-    database::{MasterEntity, master_entity, Error},
-    mongo_db::{MongoDbConfig, MongoDbCollection}
+    database::{master_entity, Error, MasterEntity, MongoDbCollection},
+    mongo_db::MongoDbConfig,
 };
 use futures::TryStreamExt;
 use mongodb::{

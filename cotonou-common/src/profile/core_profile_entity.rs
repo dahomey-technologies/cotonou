@@ -1,6 +1,5 @@
 use crate::{
-    database::MasterEntity,
-    mongo_db::MongoDbCollection,
+    database::{MasterEntity, MongoDbCollection},
     profile::profile_entity,
     types::{Platform, ProfileId},
 };

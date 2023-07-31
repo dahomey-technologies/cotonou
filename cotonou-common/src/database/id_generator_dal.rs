@@ -1,7 +1,4 @@
-use crate::{
-    database::{Error, GenericDAL},
-    mongo_db::MongoDbCollection,
-};
+use crate::database::{Error, GenericDAL, MongoDbCollection};
 use serde::{Deserialize, Serialize};
 
 const TABLE_NAME: &str = "IdGenerator";
