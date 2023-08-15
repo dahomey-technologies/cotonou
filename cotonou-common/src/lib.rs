@@ -10,6 +10,7 @@ pub mod matchmaking;
 pub mod mongo_db;
 #[cfg(feature = "notifications")]
 pub mod notifications;
+pub mod online_config;
 #[cfg(feature = "profile")]
 pub mod profile;
 #[cfg(feature = "redis")]

@@ -1,6 +1,6 @@
 use crate::{
     database::{master_entity, Error, MasterEntity, MongoDbCollection},
-    mongo_db::MongoDbConfig,
+    online_config::MongoDbConnectionStringProvider,
 };
 use futures::TryStreamExt;
 use mongodb::{
@@ -21,9 +21,9 @@ pub struct GenericDAL {
 }
 
 impl GenericDAL {
-    pub async fn initialize(mongo_config: &MongoDbConfig) -> Result<GenericDAL> {
+    pub async fn initialize(connection_string_provider: &dyn MongoDbConnectionStringProvider) -> Result<GenericDAL> {
         let mongo_options =
-            mongodb::options::ClientOptions::parse(&mongo_config.connection_string).await?;
+            mongodb::options::ClientOptions::parse(&connection_string_provider.get_connection_string()).await?;
         let database_name = mongo_options
             .default_database
             .clone()

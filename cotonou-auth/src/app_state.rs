@@ -3,8 +3,7 @@ use axum::extract::FromRef;
 use cotonou_common::{
     profile::{AccountManager, CoreProfileManager},
     database::{GenericDAL, IdGeneratorDAL},
-    mongo_db::MongoDbConfig,
-    steam::{SteamMicroTxnClient, SteamUserAuthClient, SteamUserClient}, http::HttpClient,
+    steam::{SteamMicroTxnClient, SteamUserAuthClient, SteamUserClient}, http::HttpClient, online_config::OnlineConfigManager,
 };
 use hyper_tls::HttpsConnector;
 use std::sync::Arc;
@@ -21,9 +20,9 @@ pub struct AppState {
 
 impl AppState {
     pub async fn new() -> Result<AppState, Error> {
-        let generic_dal = GenericDAL::initialize(&MongoDbConfig {
-            connection_string: "mongodb://mongo:27017/test".to_owned(),
-        })
+        let online_config_manager = OnlineConfigManager::new();
+
+        let generic_dal = GenericDAL::initialize(&online_config_manager)
         .await?;
 
         let id_generator_dal = IdGeneratorDAL {
