@@ -8,10 +8,9 @@ pub enum MatchmakingFailureReason {
     PrivateServerNotFound = 3,
     PrivateServerFull = 4,
     PrivateServerClosed = 5,
-    PrivateServerSDSlotFull = 6,
-    ServerSessionClosed = 7,
-    ExpiredInvitation = 8,
-    InvalidInvitation = 9,
+    ServerSessionClosed = 6,
+    ExpiredInvitation = 7,
+    InvalidInvitation = 8,
 }
 
 #[derive(Serialize, Deserialize)]
