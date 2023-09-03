@@ -6,7 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
+default = ["concurrency"]
 authentication = ["database", "dep:axum", "dep:jsonwebtoken"]
+concurrency = ["database"]
 database = ["dep:mongodb", "dep:bson"]
 http = ["dep:hyper", "dep:hyper-tls"]
 matchmaking = ["redis", "notifications"]

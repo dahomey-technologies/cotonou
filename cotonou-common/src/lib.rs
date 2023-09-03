@@ -1,5 +1,7 @@
 #[cfg(feature = "authentication")]
 pub mod authentication;
+#[cfg(feature = "concurrency")]
+pub mod concurrency;
 #[cfg(feature = "database")]
 pub mod database;
 #[cfg(feature = "http")]

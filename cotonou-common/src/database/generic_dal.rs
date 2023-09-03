@@ -11,9 +11,11 @@ use mongodb::{
     },
 };
 use serde::{de::DeserializeOwned, Serialize};
-use std::result;
+use std::{convert::From, fmt::Display, result};
 
 type Result<T> = result::Result<T, Error>;
+
+const MAX_TRIES: usize = 5;
 
 #[derive(Clone)]
 pub struct GenericDAL {
@@ -43,10 +45,10 @@ impl GenericDAL {
     ) -> Result<Option<T>>
     where
         T: MongoDbCollection + DeserializeOwned + Unpin + Send + Sync,
-        Bson: std::convert::From<TI>,
+        TI: Into<Bson>,
     {
         let mongo_collection = self.get_collection::<T>();
-        let filter = bson::doc! { "_id": entity_id };
+        let filter = bson::doc! { "_id": entity_id.into() };
         let options = FindOneOptions::builder()
             .projection(Self::get_projection(attributes_to_get))
             .build();
@@ -60,15 +62,12 @@ impl GenericDAL {
     ) -> Result<Vec<T>>
     where
         T: MongoDbCollection + DeserializeOwned + Unpin + Send + Sync,
-        Bson: From<TI>,
+        TI: Into<Bson>,
         TI: Clone,
     {
         let mongo_collection = self.get_collection::<T>();
 
-        let ids = entity_ids
-            .iter()
-            .map(|i| Bson::from(i.clone()))
-            .collect::<Vec<Bson>>();
+        let ids = entity_ids.iter().map(|i| i.into()).collect::<Vec<Bson>>();
         let mut filter = bson::doc! { "_id": {  } };
         filter
             .get_document_mut("_id")
@@ -89,17 +88,17 @@ impl GenericDAL {
     pub async fn get_entity<T, TI>(&self, entity_id: TI) -> Result<Option<T>>
     where
         T: MongoDbCollection + DeserializeOwned + Unpin + Send + Sync,
-        Bson: std::convert::From<TI>,
+        TI: Into<Bson>,
     {
         let mongo_collection = self.get_collection::<T>();
-        let filter = bson::doc! { "_id": entity_id };
+        let filter = bson::doc! { "_id": entity_id.into() };
         Ok(mongo_collection.find_one(filter, None).await?)
     }
 
     pub async fn save_master_entity<T, TI>(&self, entity: &mut T) -> Result<bool>
     where
         T: MasterEntity<TI> + Serialize + Unpin + Send + Sync,
-        Bson: std::convert::From<TI>,
+        TI: Into<Bson>,
     {
         if entity.get_creation_date() == DateTime::MIN {
             entity.set_creation_date(DateTime::now());
@@ -124,6 +123,55 @@ impl GenericDAL {
         Ok(result.modified_count == 1 || result.upserted_id.is_some())
     }
 
+    pub async fn save_master_entity_with_comparison<T, TI>(
+        &self,
+        original_entity: Option<&T>,
+        modified_entity: Option<&mut T>,
+    ) -> Result<bool>
+    where
+        T: MasterEntity<TI> + Serialize + Unpin + Send + Sync + PartialEq,
+        TI: Display + Into<Bson>,
+    {
+        let mongo_collection = self.get_collection::<T>();
+
+        match (original_entity, modified_entity) {
+            (None, None) => Ok(true),
+            // creation
+            (None, Some(modified_entity)) => {
+                modified_entity.set_creation_date(DateTime::now());
+                modified_entity.set_last_modification_date(DateTime::now());
+                modified_entity.set_data_version(Some(1));
+
+                let _result = mongo_collection.insert_one(modified_entity, None).await?;
+
+                Ok(true)
+            }
+            // deletion
+            (Some(original_entity), None) => {
+                self.delete_entity::<T, TI>(original_entity.get_id())
+                    .await?;
+                log::info!("Entity {} has been deleted", original_entity.get_id());
+
+                Ok(true)
+            }
+            // update
+            (Some(original_entity), Some(modified_entity)) => {
+                if original_entity == modified_entity {
+                    return Ok(true);
+                }
+
+                let original_data_version = original_entity.get_data_version().unwrap_or(0);
+                modified_entity.set_data_version(Some(original_data_version + 1));
+                modified_entity.set_last_modification_date(DateTime::now());
+
+                let filter = bson::doc! { "_id": modified_entity.get_id().into(), master_entity::DATA_VERSION_PROPERTY: original_data_version };
+                let result = mongo_collection.replace_one(filter, modified_entity, None).await?;
+
+                Ok(result.modified_count == 1)
+            }
+        }
+    }
+
     pub async fn save_entity<T>(&self, entity: &mut T) -> Result<()>
     where
         T: MongoDbCollection + Serialize + Unpin + Send + Sync,
@@ -141,8 +189,8 @@ impl GenericDAL {
     ) -> Result<()>
     where
         T: MongoDbCollection + Serialize + Unpin + Send + Sync,
-        Bson: std::convert::From<TI>,
-        Bson: std::convert::From<TP>,
+        Bson: From<TI>,
+        Bson: From<TP>,
     {
         let mongo_collection = self.get_collection::<T>();
 
@@ -155,6 +203,18 @@ impl GenericDAL {
         Ok(())
     }
 
+    pub async fn delete_entity<T, TI>(&self, entity_id: TI) -> Result<bool>
+    where
+        T: MongoDbCollection,
+        TI: Into<Bson>,
+    {
+        let mongo_collection = self.get_collection::<T>();
+        let result = mongo_collection
+            .delete_one(bson::doc! { "_id": entity_id.into() }, None)
+            .await?;
+        Ok(result.deleted_count == 1)
+    }
+
     pub async fn increment_property<T, TI>(
         &self,
         entity_id: TI,
@@ -163,7 +223,7 @@ impl GenericDAL {
     ) -> Result<Option<i64>>
     where
         T: MongoDbCollection + Serialize + Unpin + Send + Sync,
-        Bson: std::convert::From<TI>,
+        Bson: From<TI>,
     {
         let bson_value = self
             .increment_property_impl::<T, TI, i64>(entity_id, property_name, value)
@@ -182,13 +242,14 @@ impl GenericDAL {
     ) -> Result<Option<bson::Bson>>
     where
         T: MongoDbCollection + Serialize + Unpin + Send + Sync,
-        Bson: std::convert::From<TI>,
-        Bson: std::convert::From<TP>,
+        TI: Into<Bson>,
+        TP: Into<Bson>,
     {
         let mongo_collection = self.get_bson_document_collection::<T>();
 
-        let filter = bson::doc! { "_id": entity_id };
-        let update = UpdateModifications::Document(bson::doc! { "$inc": {property_name: value} });
+        let filter = bson::doc! { "_id": entity_id.into() };
+        let update =
+            UpdateModifications::Document(bson::doc! { "$inc": {property_name: value.into()} });
         let options = FindOneAndUpdateOptions::builder()
             .upsert(true)
             .return_document(ReturnDocument::After)
